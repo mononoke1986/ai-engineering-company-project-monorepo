@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>HealthCore | Healthcare that fits your life</title>
+	<script src="https://cdn.tailwindcss.com"></script>
 	<meta
 		name="description"
 		content="12 outpatient clinics across the U.S. and U.K. offering same-day appointments, extended hours, and bilingual care, so you get the care you need, when you need it."
@@ -109,150 +110,156 @@
 		]
 	</script>
 </head>
-<body>
-	<header>
-		<nav aria-label="Primary">
-			<p><strong>HealthCore</strong></p>
-			<ul>
-				<li><a href="#home">Home</a></li>
-				<li><a href="#services">Services</a></li>
-				<li><a href="#locations">Locations</a></li>
-				<li><a href="#contact">Contact</a></li>
+<body class="bg-slate-50 text-slate-800 antialiased">
+	<header class="sticky top-0 z-50 border-b border-sky-100 bg-white/95 shadow-sm backdrop-blur">
+		<nav aria-label="Primary" class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+			<p class="text-2xl font-extrabold tracking-tight text-sky-900"><strong>HealthCore</strong></p>
+			<ul class="flex flex-col gap-2 text-sm font-medium text-slate-700 sm:flex-row sm:flex-wrap sm:items-center sm:gap-5 lg:text-base">
+				<li><a href="#home" class="rounded-full px-3 py-2 transition hover:bg-sky-50 hover:text-sky-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">Home</a></li>
+				<li><a href="#services" class="rounded-full px-3 py-2 transition hover:bg-sky-50 hover:text-sky-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">Services</a></li>
+				<li><a href="#locations" class="rounded-full px-3 py-2 transition hover:bg-sky-50 hover:text-sky-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">Locations</a></li>
+				<li><a href="#contact" class="rounded-full px-3 py-2 transition hover:bg-sky-50 hover:text-sky-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">Contact</a></li>
 			</ul>
 		</nav>
-		<p>Language: <a href="index.html" aria-current="page">EN</a> | <a href="index.es.html">ES</a></p>
+		<p class="mx-auto flex max-w-7xl items-center gap-2 px-4 pb-4 text-sm text-slate-600 sm:px-6 lg:px-8">Language: <a href="index.html" aria-current="page" class="rounded-full bg-sky-700 px-3 py-1 font-semibold text-white transition hover:bg-sky-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">EN</a> <span aria-hidden="true" class="text-slate-400">|</span> <a href="index.es.html" class="rounded-full border border-sky-200 px-3 py-1 font-semibold text-sky-800 transition hover:border-sky-300 hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">ES</a></p>
 	</header>
 
-	<main>
-		<section id="home" aria-labelledby="hero-heading">
-			<h1 id="hero-heading">Healthcare that fits your life</h1>
-			<p>
+	<main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-14">
+		<section id="home" aria-labelledby="hero-heading" class="rounded-3xl bg-gradient-to-br from-sky-100 via-white to-emerald-50 px-6 py-12 shadow-sm ring-1 ring-sky-100 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
+			<h1 id="hero-heading" class="max-w-3xl text-4xl font-extrabold tracking-tight text-sky-950 sm:text-5xl lg:text-6xl">Healthcare that fits your life</h1>
+			<p class="mt-6 max-w-2xl text-lg leading-8 text-slate-700 sm:text-xl">
 				12 outpatient clinics across the U.S. and U.K. offering same-day appointments,
 				extended hours, and bilingual care, so you get the care you need, when you need it.
 			</p>
-			<p><a href="application.html">Request an Appointment</a></p>
+			<p class="mt-8"><a href="application.html" class="inline-flex items-center rounded-full bg-sky-700 px-6 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-sky-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">Request an Appointment</a></p>
 		</section>
 
-		<section id="services" aria-labelledby="services-heading">
-			<h2 id="services-heading">Services</h2>
-			<article>
-				<h3>Primary Care &amp; Chronic Disease Management</h3>
-				<ul>
-					<li>Same-day appointments with primary care physicians</li>
-					<li>Ongoing management of diabetes, hypertension, and asthma</li>
+		<section id="services" aria-labelledby="services-heading" class="mt-12 sm:mt-16">
+			<h2 id="services-heading" class="text-3xl font-bold tracking-tight text-sky-950 sm:text-4xl">Services</h2>
+			<div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+			<article class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 md:col-span-1">
+				<h3 class="text-xl font-semibold text-sky-900">Primary Care &amp; Chronic Disease Management</h3>
+				<ul class="mt-4 space-y-3 text-slate-700">
+					<li class="rounded-xl bg-sky-50 px-4 py-3">Same-day appointments with primary care physicians</li>
+					<li class="rounded-xl bg-sky-50 px-4 py-3">Ongoing management of diabetes, hypertension, and asthma</li>
 				</ul>
 			</article>
-			<article>
-				<h3>Specialist Consultations</h3>
-				<ul>
-					<li>Cardiology, endocrinology, pulmonology, and women's health</li>
-					<li>Coordinated referrals within the HealthCore network</li>
+			<article class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 md:col-span-1">
+				<h3 class="text-xl font-semibold text-sky-900">Specialist Consultations</h3>
+				<ul class="mt-4 space-y-3 text-slate-700">
+					<li class="rounded-xl bg-emerald-50 px-4 py-3">Cardiology, endocrinology, pulmonology, and women's health</li>
+					<li class="rounded-xl bg-emerald-50 px-4 py-3">Coordinated referrals within the HealthCore network</li>
 				</ul>
 			</article>
-			<article>
-				<h3>Preventive Health &amp; Wellness</h3>
-				<ul>
-					<li>Check-ups, vaccinations, and annual screenings</li>
-					<li>Mental health counseling and psychiatric referrals</li>
+			<article class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 md:col-span-1">
+				<h3 class="text-xl font-semibold text-sky-900">Preventive Health &amp; Wellness</h3>
+				<ul class="mt-4 space-y-3 text-slate-700">
+					<li class="rounded-xl bg-sky-50 px-4 py-3">Check-ups, vaccinations, and annual screenings</li>
+					<li class="rounded-xl bg-sky-50 px-4 py-3">Mental health counseling and psychiatric referrals</li>
 				</ul>
 			</article>
+			</div>
 		</section>
 
-		<section aria-labelledby="why-heading">
-			<h2 id="why-heading">Why HealthCore</h2>
-			<article>
-				<ul>
-					<li>Same-day appointments at most locations</li>
-					<li>Extended hours: weekdays until 7pm or 8pm, Saturdays available</li>
+		<section aria-labelledby="why-heading" class="mt-12 sm:mt-16">
+			<h2 id="why-heading" class="text-3xl font-bold tracking-tight text-sky-950 sm:text-4xl">Why HealthCore</h2>
+			<div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+			<article class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+				<ul class="space-y-3 text-slate-700">
+					<li class="rounded-xl bg-sky-50 px-4 py-3">Same-day appointments at most locations</li>
+					<li class="rounded-xl bg-sky-50 px-4 py-3">Extended hours: weekdays until 7pm or 8pm, Saturdays available</li>
 				</ul>
 			</article>
-			<article>
-				<ul>
-					<li>Bilingual staff (English and Spanish) at U.S. locations</li>
-					<li>12 clinics across Texas, Florida, Georgia, and the U.K.</li>
+			<article class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+				<ul class="space-y-3 text-slate-700">
+					<li class="rounded-xl bg-emerald-50 px-4 py-3">Bilingual staff (English and Spanish) at U.S. locations</li>
+					<li class="rounded-xl bg-emerald-50 px-4 py-3">12 clinics across Texas, Florida, Georgia, and the U.K.</li>
 				</ul>
 			</article>
+			</div>
 		</section>
 
-		<section id="locations" aria-labelledby="locations-heading">
-			<h2 id="locations-heading">Locations</h2>
-			<p>HealthCore clinics in the United Kingdom serve an independent market and do not appear on this site.</p>
-			<table>
-				<caption>HealthCore U.S. clinic locations</caption>
-				<thead>
+		<section id="locations" aria-labelledby="locations-heading" class="mt-12 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:mt-16 sm:p-8">
+			<h2 id="locations-heading" class="text-3xl font-bold tracking-tight text-sky-950 sm:text-4xl">Locations</h2>
+			<p class="mt-4 max-w-3xl text-slate-700">HealthCore clinics in the United Kingdom serve an independent market and do not appear on this site.</p>
+			<div class="overflow-x-auto">
+			<table class="mt-6 min-w-full border-separate border-spacing-0 overflow-hidden rounded-2xl text-left text-sm sm:text-base">
+				<caption class="pb-4 text-left text-sm font-medium text-slate-600">HealthCore U.S. clinic locations</caption>
+				<thead class="bg-sky-100 text-sky-950">
 					<tr>
-						<th scope="col">Clinic Name</th>
-						<th scope="col">City</th>
-						<th scope="col">State</th>
-						<th scope="col">Phone</th>
-						<th scope="col">Hours</th>
+						<th scope="col" class="px-4 py-3 font-semibold">Clinic Name</th>
+						<th scope="col" class="px-4 py-3 font-semibold">City</th>
+						<th scope="col" class="px-4 py-3 font-semibold">State</th>
+						<th scope="col" class="px-4 py-3 font-semibold">Phone</th>
+						<th scope="col" class="px-4 py-3 font-semibold">Hours</th>
 					</tr>
 				</thead>
-				<tbody>
-					<tr>
-						<th scope="row">HealthCore Austin Central</th>
-						<td>Austin</td>
-						<td>TX</td>
-						<td><a href="tel:+15123408800">(512) 340-8800</a></td>
-						<td>Mon-Fri 7am-8pm · Sat 9am-3pm</td>
+				<tbody class="bg-white text-slate-700">
+					<tr class="transition hover:bg-sky-50">
+						<th scope="row" class="border-t border-slate-200 px-4 py-4 font-semibold text-sky-900">HealthCore Austin Central</th>
+						<td class="border-t border-slate-200 px-4 py-4">Austin</td>
+						<td class="border-t border-slate-200 px-4 py-4">TX</td>
+						<td class="border-t border-slate-200 px-4 py-4"><a href="tel:+15123408800" class="font-medium text-sky-700 underline decoration-sky-200 underline-offset-4 transition hover:text-sky-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">(512) 340-8800</a></td>
+						<td class="border-t border-slate-200 px-4 py-4">Mon-Fri 7am-8pm · Sat 9am-3pm</td>
 					</tr>
-					<tr>
-						<th scope="row">HealthCore Austin North</th>
-						<td>Austin</td>
-						<td>TX</td>
-						<td><a href="tel:+15123408810">(512) 340-8810</a></td>
-						<td>Mon-Fri 8am-7pm</td>
+					<tr class="transition hover:bg-sky-50">
+						<th scope="row" class="border-t border-slate-200 px-4 py-4 font-semibold text-sky-900">HealthCore Austin North</th>
+						<td class="border-t border-slate-200 px-4 py-4">Austin</td>
+						<td class="border-t border-slate-200 px-4 py-4">TX</td>
+						<td class="border-t border-slate-200 px-4 py-4"><a href="tel:+15123408810" class="font-medium text-sky-700 underline decoration-sky-200 underline-offset-4 transition hover:text-sky-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">(512) 340-8810</a></td>
+						<td class="border-t border-slate-200 px-4 py-4">Mon-Fri 8am-7pm</td>
 					</tr>
-					<tr>
-						<th scope="row">HealthCore San Antonio</th>
-						<td>San Antonio</td>
-						<td>TX</td>
-						<td><a href="tel:+12107204400">(210) 720-4400</a></td>
-						<td>Mon-Fri 8am-6pm · Sat 9am-1pm</td>
+					<tr class="transition hover:bg-sky-50">
+						<th scope="row" class="border-t border-slate-200 px-4 py-4 font-semibold text-sky-900">HealthCore San Antonio</th>
+						<td class="border-t border-slate-200 px-4 py-4">San Antonio</td>
+						<td class="border-t border-slate-200 px-4 py-4">TX</td>
+						<td class="border-t border-slate-200 px-4 py-4"><a href="tel:+12107204400" class="font-medium text-sky-700 underline decoration-sky-200 underline-offset-4 transition hover:text-sky-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">(210) 720-4400</a></td>
+						<td class="border-t border-slate-200 px-4 py-4">Mon-Fri 8am-6pm · Sat 9am-1pm</td>
 					</tr>
-					<tr>
-						<th scope="row">HealthCore Miami</th>
-						<td>Miami</td>
-						<td>FL</td>
-						<td><a href="tel:+13055107700">(305) 510-7700</a></td>
-						<td>Mon-Fri 7am-8pm · Sat 9am-4pm</td>
+					<tr class="transition hover:bg-sky-50">
+						<th scope="row" class="border-t border-slate-200 px-4 py-4 font-semibold text-sky-900">HealthCore Miami</th>
+						<td class="border-t border-slate-200 px-4 py-4">Miami</td>
+						<td class="border-t border-slate-200 px-4 py-4">FL</td>
+						<td class="border-t border-slate-200 px-4 py-4"><a href="tel:+13055107700" class="font-medium text-sky-700 underline decoration-sky-200 underline-offset-4 transition hover:text-sky-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">(305) 510-7700</a></td>
+						<td class="border-t border-slate-200 px-4 py-4">Mon-Fri 7am-8pm · Sat 9am-4pm</td>
 					</tr>
-					<tr>
-						<th scope="row">HealthCore Orlando</th>
-						<td>Orlando</td>
-						<td>FL</td>
-						<td><a href="tel:+14078926600">(407) 892-6600</a></td>
-						<td>Mon-Fri 8am-6pm</td>
+					<tr class="transition hover:bg-sky-50">
+						<th scope="row" class="border-t border-slate-200 px-4 py-4 font-semibold text-sky-900">HealthCore Orlando</th>
+						<td class="border-t border-slate-200 px-4 py-4">Orlando</td>
+						<td class="border-t border-slate-200 px-4 py-4">FL</td>
+						<td class="border-t border-slate-200 px-4 py-4"><a href="tel:+14078926600" class="font-medium text-sky-700 underline decoration-sky-200 underline-offset-4 transition hover:text-sky-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">(407) 892-6600</a></td>
+						<td class="border-t border-slate-200 px-4 py-4">Mon-Fri 8am-6pm</td>
 					</tr>
-					<tr>
-						<th scope="row">HealthCore Atlanta</th>
-						<td>Atlanta</td>
-						<td>GA</td>
-						<td><a href="tel:+14043309900">(404) 330-9900</a></td>
-						<td>Mon-Fri 8am-7pm</td>
+					<tr class="transition hover:bg-sky-50">
+						<th scope="row" class="border-t border-slate-200 px-4 py-4 font-semibold text-sky-900">HealthCore Atlanta</th>
+						<td class="border-t border-slate-200 px-4 py-4">Atlanta</td>
+						<td class="border-t border-slate-200 px-4 py-4">GA</td>
+						<td class="border-t border-slate-200 px-4 py-4"><a href="tel:+14043309900" class="font-medium text-sky-700 underline decoration-sky-200 underline-offset-4 transition hover:text-sky-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">(404) 330-9900</a></td>
+						<td class="border-t border-slate-200 px-4 py-4">Mon-Fri 8am-7pm</td>
 					</tr>
 				</tbody>
 			</table>
+			</div>
 		</section>
 
-		<section id="contact" aria-labelledby="contact-heading">
-			<h2 id="contact-heading">Contact</h2>
-			<address>
-				<p>General inquiries: <a href="mailto:info@healthcore.com">info@healthcore.com</a></p>
-				<p>Austin HQ: <a href="tel:+15123408800">(512) 340-8800</a></p>
-				<p>Miami: <a href="tel:+13055107700">(305) 510-7700</a></p>
-				<p>United Kingdom (London): <a href="tel:+442079460100">+44 20 7946 0100</a></p>
+		<section id="contact" aria-labelledby="contact-heading" class="mt-12 rounded-3xl bg-gradient-to-br from-emerald-50 to-white px-6 py-8 shadow-sm ring-1 ring-emerald-100 sm:mt-16 sm:px-8 sm:py-10">
+			<h2 id="contact-heading" class="text-3xl font-bold tracking-tight text-sky-950 sm:text-4xl">Contact</h2>
+			<address class="mt-6 space-y-4 text-base not-italic text-slate-700">
+				<p class="rounded-2xl bg-white px-4 py-4 shadow-sm ring-1 ring-slate-200">General inquiries: <a href="mailto:info@healthcore.com" class="font-medium text-sky-700 underline decoration-sky-200 underline-offset-4 transition hover:text-sky-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">info@healthcore.com</a></p>
+				<p class="rounded-2xl bg-white px-4 py-4 shadow-sm ring-1 ring-slate-200">Austin HQ: <a href="tel:+15123408800" class="font-medium text-sky-700 underline decoration-sky-200 underline-offset-4 transition hover:text-sky-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">(512) 340-8800</a></p>
+				<p class="rounded-2xl bg-white px-4 py-4 shadow-sm ring-1 ring-slate-200">Miami: <a href="tel:+13055107700" class="font-medium text-sky-700 underline decoration-sky-200 underline-offset-4 transition hover:text-sky-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">(305) 510-7700</a></p>
+				<p class="rounded-2xl bg-white px-4 py-4 shadow-sm ring-1 ring-slate-200">United Kingdom (London): <a href="tel:+442079460100" class="font-medium text-sky-700 underline decoration-sky-200 underline-offset-4 transition hover:text-sky-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">+44 20 7946 0100</a></p>
 			</address>
 		</section>
 	</main>
 
-	<footer>
-		<p>&copy; 2025 HealthCore. All rights reserved.</p>
-		<nav aria-label="Social media">
-			<ul>
-				<li><a href="#">LinkedIn</a></li>
-				<li><a href="#">Facebook</a></li>
-				<li><a href="#">Instagram</a></li>
+	<footer class="bg-sky-950 text-sky-50">
+		<p class="mx-auto max-w-7xl px-4 pt-8 text-sm text-sky-100 sm:px-6 lg:px-8">&copy; 2025 HealthCore. All rights reserved.</p>
+		<nav aria-label="Social media" class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+			<ul class="flex flex-wrap items-center gap-4 text-sm font-medium sm:gap-6">
+				<li><a href="#" class="rounded-full px-3 py-2 transition hover:bg-sky-900 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">LinkedIn</a></li>
+				<li><a href="#" class="rounded-full px-3 py-2 transition hover:bg-sky-900 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Facebook</a></li>
+				<li><a href="#" class="rounded-full px-3 py-2 transition hover:bg-sky-900 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Instagram</a></li>
 			</ul>
 		</nav>
 	</footer>
