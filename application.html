@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HealthCore | Patient Consultation Form</title>
+</head>
+<body>
+	<header>
+		<nav aria-label="Primary">
+			<p><strong>HealthCore</strong></p>
+			<ul>
+				<li><a href="index.html#home">Home</a></li>
+				<li><a href="index.html#services">Services</a></li>
+				<li><a href="index.html#locations">Locations</a></li>
+				<li><a href="index.html#contact">Contact</a></li>
+			</ul>
+		</nav>
+		<p>Language: <a href="application.html" aria-current="page">EN</a> | <a href="application.es.html">ES</a></p>
+	</header>
+
+	<main>
+		<section aria-labelledby="consultation-form-heading">
+			<h1 id="consultation-form-heading">Patient Consultation Form</h1>
+			<p>
+				Are you a healthcare provider or organization looking to partner with HealthCore? Contact our operations team at
+				<a href="mailto:partnerships@healthcore.com">partnerships@healthcore.com</a>
+			</p>
+
+			<form action="#" method="post">
+				<fieldset>
+					<legend>Personal Information</legend>
+
+					<p>
+						<label for="first_name">First Name</label>
+						<input type="text" id="first_name" name="first_name" autocomplete="given-name" placeholder="Enter your first name" required>
+					</p>
+
+					<p>
+						<label for="last_name">Last Name</label>
+						<input type="text" id="last_name" name="last_name" autocomplete="family-name" placeholder="Enter your last name" required>
+					</p>
+
+					<p>
+						<label for="date_of_birth">Date of Birth</label>
+						<input type="date" id="date_of_birth" name="date_of_birth" autocomplete="bday" required>
+					</p>
+
+					<p>
+						<label for="email">Email</label>
+						<input type="email" id="email" name="email" autocomplete="email" placeholder="name@example.com" required>
+					</p>
+
+					<p>
+						<label for="phone">Phone Number</label>
+						<input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="(555) 123-4567" required>
+					</p>
+
+					<p>
+						<label for="preferred_language">Preferred Language</label>
+						<select id="preferred_language" name="preferred_language" required>
+							<option value="">Select an option</option>
+							<option value="English">English</option>
+							<option value="Spanish">Spanish</option>
+						</select>
+					</p>
+				</fieldset>
+
+				<fieldset>
+					<legend>Appointment Information</legend>
+
+					<p>
+						<label for="preferred_clinic">Preferred Clinic</label>
+						<select id="preferred_clinic" name="preferred_clinic" required>
+							<option value="">Select a clinic</option>
+							<option value="HealthCore Austin Central">HealthCore Austin Central</option>
+							<option value="HealthCore Austin North">HealthCore Austin North</option>
+							<option value="HealthCore San Antonio">HealthCore San Antonio</option>
+							<option value="HealthCore Miami">HealthCore Miami</option>
+							<option value="HealthCore Orlando">HealthCore Orlando</option>
+							<option value="HealthCore Atlanta">HealthCore Atlanta</option>
+						</select>
+					</p>
+
+					<p>
+						<label for="preferred_date">Preferred Date</label>
+						<input type="date" id="preferred_date" name="preferred_date" required>
+					</p>
+
+					<p>
+						<label for="preferred_time">Preferred Time Slot</label>
+						<select id="preferred_time" name="preferred_time" required>
+							<option value="">Select a time slot</option>
+							<option value="Morning (7am-12pm)">Morning (7am&ndash;12pm)</option>
+							<option value="Afternoon (12pm-5pm)">Afternoon (12pm&ndash;5pm)</option>
+							<option value="Evening (5pm-8pm)">Evening (5pm&ndash;8pm)</option>
+						</select>
+					</p>
+
+					<p>
+						<label for="service_type">Service Needed</label>
+						<select id="service_type" name="service_type" required>
+							<option value="">Select a service</option>
+							<option value="Primary Care">Primary Care</option>
+							<option value="Chronic Disease Management">Chronic Disease Management</option>
+							<option value="Specialist Consultation">Specialist Consultation</option>
+							<option value="Preventive Health">Preventive Health</option>
+							<option value="Women's Health">Women's Health</option>
+							<option value="Paediatric Care">Paediatric Care</option>
+							<option value="Mental Health">Mental Health</option>
+						</select>
+					</p>
+				</fieldset>
+
+				<fieldset>
+					<legend>Patient Status and Insurance</legend>
+
+					<fieldset>
+						<legend>Is this your first visit to HealthCore?</legend>
+						<p>
+							<input type="radio" id="new_patient_yes" name="new_patient" value="Yes" required>
+							<label for="new_patient_yes">Yes</label>
+						</p>
+						<p>
+							<input type="radio" id="new_patient_no" name="new_patient" value="No">
+							<label for="new_patient_no">No</label>
+						</p>
+					</fieldset>
+
+					<fieldset>
+						<legend>Do you have health insurance?</legend>
+						<p>
+							<input type="radio" id="has_insurance_yes" name="has_insurance" value="Yes" required>
+							<label for="has_insurance_yes">Yes</label>
+						</p>
+						<p>
+							<input type="radio" id="has_insurance_no" name="has_insurance" value="No">
+							<label for="has_insurance_no">No</label>
+						</p>
+					</fieldset>
+
+					<div id="insuranceFields" class="hidden">
+						<p>
+							<label for="insurance_provider">Insurance Provider</label>
+							<input type="text" id="insurance_provider" name="insurance_provider" placeholder="Enter your insurance provider">
+						</p>
+
+						<p>
+							<label for="insurance_member_id">Member ID</label>
+							<input type="text" id="insurance_member_id" name="insurance_member_id" placeholder="Enter your member ID">
+						</p>
+					</div>
+
+					<div id="patientIdField" class="hidden">
+						<p>
+							<label for="patient_id">Patient ID</label>
+							<input type="text" id="patient_id" name="patient_id" placeholder="Enter your patient ID">
+						</p>
+					</div>
+				</fieldset>
+
+				<fieldset>
+					<legend>Medical Concern and Consent</legend>
+
+					<p>
+						<label for="health_concern">Brief description of your medical concern</label>
+						<textarea id="health_concern" name="health_concern" rows="6" maxlength="500" placeholder="Describe your symptoms or concern" required></textarea>
+					</p>
+					<p>Character count: <span id="charCount">0</span>/500</p>
+
+					<p>
+						<input type="checkbox" id="contact_consent" name="contact_consent" required>
+						<label for="contact_consent">I consent to being contacted by HealthCore</label>
+					</p>
+				</fieldset>
+
+				<p>
+					<button type="submit">Submit Consultation</button>
+					<button type="reset">Clear Form</button>
+				</p>
+			</form>
+		</section>
+	</main>
+
+	<footer>
+		<p>&copy; 2025 HealthCore. All rights reserved.</p>
+		<nav aria-label="Social media">
+			<ul>
+				<li><a href="#">LinkedIn</a></li>
+				<li><a href="#">Facebook</a></li>
+				<li><a href="#">Instagram</a></li>
+			</ul>
+		</nav>
+	</footer>
+</body>
+</html>
