@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const healthConcernTextarea = document.getElementById("health_concern");
 	const charCount = document.getElementById("charCount");
 	const contactConsentCheckbox = document.getElementById("contact_consent");
+	const currentLanguage = document.documentElement.lang === "es" ? "es" : "en";
 	const clinicClosingTimes = {
 		"HealthCore Austin Central": 20,
 		"HealthCore Austin North": 19,
@@ -50,6 +51,20 @@ document.addEventListener("DOMContentLoaded", () => {
 		patient_id: "Patient ID must match the format HC- followed by exactly 6 letters or numbers",
 		health_concern: "Describe your medical concern using at least 20 characters (X characters remaining)",
 		contact_consent: "You must consent to being contacted before submitting the form"
+	};
+	const successMessages = {
+		en: [
+			"Thank you for contacting HealthCore.",
+			"We have received your consultation request. A member of our front desk team will reach out within 1 business day to confirm your appointment details and answer any questions.",
+			"If you need urgent assistance, please call your preferred clinic directly using the numbers listed on our website.",
+			"We look forward to caring for you soon."
+		],
+		es: [
+			"Gracias por contactar a HealthCore.",
+			"Hemos recibido tu consulta. Un miembro de nuestro equipo de recepción se pondrá en contacto contigo dentro de 1 día hábil para confirmar los detalles de tu cita y responder cualquier pregunta.",
+			"Si necesitas asistencia urgente, llama directamente a tu clínica preferida usando los números listados en nuestro sitio web.",
+			"Esperamos poder atenderte pronto."
+		]
 	};
 
 	// Validation Functions
@@ -380,6 +395,35 @@ document.addEventListener("DOMContentLoaded", () => {
 		charCount.textContent = healthConcernTextarea.value.length;
 	}
 
+	function showSuccessMessage() {
+		const existingMessage = document.getElementById("form_success_message");
+
+		if (existingMessage) {
+			existingMessage.remove();
+		}
+
+		const successElement = document.createElement("section");
+		successElement.id = "form_success_message";
+		successElement.setAttribute("role", "status");
+		successElement.setAttribute("aria-live", "polite");
+		successElement.className = "rounded-3xl border border-emerald-200 bg-emerald-50 p-6 text-emerald-950 shadow-sm ring-1 ring-emerald-100 sm:p-8";
+
+		const title = document.createElement("p");
+		title.className = "text-2xl font-bold tracking-tight text-emerald-900";
+		title.textContent = currentLanguage === "es" ? "Solicitud enviada" : "Request received";
+		successElement.appendChild(title);
+
+		successMessages[currentLanguage].forEach((message, index) => {
+			const paragraph = document.createElement("p");
+			paragraph.className = index === 0 ? "mt-4 text-base font-semibold leading-7" : "mt-4 text-base leading-7 text-emerald-900";
+			paragraph.textContent = message;
+			successElement.appendChild(paragraph);
+		});
+
+		form.insertAdjacentElement("afterend", successElement);
+		form.classList.add("hidden");
+	}
+
 	function updateTimeClinicWarning() {
 		const existingWarning = document.getElementById("time_clinic_warning");
 		const isEveningSlot = preferredTimeSelect.value === "Evening (5pm-8pm)";
@@ -482,6 +526,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// Submit Handler
 	form.addEventListener("submit", (event) => {
+		event.preventDefault();
+
 		const isFirstNameValid = validateFirstName();
 		const isLastNameValid = validateLastName();
 		const isDateOfBirthValid = validateDateOfBirth();
@@ -517,8 +563,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			isHealthConcernValid &&
 			isConsentValid;
 
-		if (!isFormValid) {
-			event.preventDefault();
+		if (isFormValid) {
+			showSuccessMessage();
 		}
 	});
 });
