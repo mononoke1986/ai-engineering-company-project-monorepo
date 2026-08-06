@@ -33,25 +33,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// Error Messages
 	const errorMessages = {
-		first_name: "First name must contain only letters and be between 2 and 50 characters long, excluding spaces",
-		last_name: "Last name must contain only letters and be between 2 and 50 characters long, excluding spaces",
-		date_of_birth: "Enter a valid date of birth. Patient age must be between 0 and 120 years.",
-		email: "Enter a valid email address (example: name@provider.com)",
-		phone: "Phone number must include a country code (example: +1 305 555 0191)",
-		preferred_language: "Select your preferred language",
-		preferred_clinic: "Select the clinic you would like to visit",
-		preferred_date: "Select a date at least 1 business day from today and no more than 60 days ahead",
-		preferred_time: "Select your preferred appointment time",
-		service_type: "Select the type of care you are looking for",
-		service_type_paediatric: "Paediatric Care is available for patients under 18 years old. Please review the date of birth or select another service.",
-		new_patient: "Indicate whether this is your first visit to HealthCore",
-		has_insurance: "Indicate whether you have health insurance",
-		insurance_provider: "Enter your insurance provider",
-		insurance_member_id: "Member ID must contain 6 to 20 alphanumeric characters",
-		patient_id: "Patient ID must match the format HC- followed by exactly 6 letters or numbers",
-		health_concern: "Describe your medical concern using at least 20 characters (X characters remaining)",
-		contact_consent: "You must consent to being contacted before submitting the form"
+		en: {
+			first_name: "First name must contain only letters and be between 2 and 50 characters long, excluding spaces",
+			last_name: "Last name must contain only letters and be between 2 and 50 characters long, excluding spaces",
+			date_of_birth: "Enter a valid date of birth. Patient age must be between 0 and 120 years.",
+			email: "Enter a valid email address (example: name@provider.com)",
+			phone: "Phone number must include a country code (example: +1 305 555 0191)",
+			preferred_language: "Select your preferred language",
+			preferred_clinic: "Select the clinic you would like to visit",
+			preferred_date: "Select a date at least 1 business day from today and no more than 60 days ahead",
+			preferred_time: "Select your preferred appointment time",
+			service_type: "Select the type of care you are looking for",
+			service_type_paediatric: "Paediatric Care is available for patients under 18 years old. Please review the date of birth or select another service.",
+			new_patient: "Indicate whether this is your first visit to HealthCore",
+			has_insurance: "Indicate whether you have health insurance",
+			insurance_provider: "Enter your insurance provider",
+			insurance_member_id: "Member ID must contain 6 to 20 alphanumeric characters",
+			patient_id: "Patient ID must match the format HC- followed by exactly 6 letters or numbers",
+			health_concern: "Describe your medical concern using at least 20 characters (X characters remaining)",
+			contact_consent: "You must consent to being contacted before submitting the form"
+		},
+		es: {
+			first_name: "El nombre debe contener solo letras y tener entre 2 y 50 caracteres, sin contar espacios",
+			last_name: "El apellido debe contener solo letras y tener entre 2 y 50 caracteres, sin contar espacios",
+			date_of_birth: "Ingresa una fecha de nacimiento válida. La edad del paciente debe estar entre 0 y 120 años.",
+			email: "Ingresa un correo electrónico válido (ejemplo: nombre@proveedor.com)",
+			phone: "El número de teléfono debe incluir un código de país (ejemplo: +1 305 555 0191)",
+			preferred_language: "Selecciona tu idioma preferido",
+			preferred_clinic: "Selecciona la clínica a la que deseas asistir",
+			preferred_date: "Selecciona una fecha al menos 1 día hábil después de hoy y no más de 60 días hacia adelante",
+			preferred_time: "Selecciona tu horario preferido para la cita",
+			service_type: "Selecciona el tipo de atención que estás buscando",
+			service_type_paediatric: "La Atención Pediátrica está disponible para pacientes menores de 18 años. Revisa la fecha de nacimiento o selecciona otro servicio.",
+			new_patient: "Indica si esta es tu primera visita a HealthCore",
+			has_insurance: "Indica si tienes seguro médico",
+			insurance_provider: "Ingresa tu aseguradora",
+			insurance_member_id: "El ID de afiliado debe contener entre 6 y 20 caracteres alfanuméricos",
+			patient_id: "El ID de paciente debe coincidir con el formato HC- seguido de exactamente 6 letras o números",
+			health_concern: "Describe tu consulta médica usando al menos 20 caracteres (faltan X caracteres)",
+			contact_consent: "Debes dar tu consentimiento para ser contactado antes de enviar el formulario"
+		}
 	};
+	const localizedErrorMessages = errorMessages[currentLanguage];
 	const successMessages = {
 		en: [
 			"Thank you for contacting HealthCore.",
@@ -229,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 
 			if (!Number.isNaN(birthDate.getTime()) && age >= 18) {
-				serviceTypeSelect.dataset.errorMessage = errorMessages.service_type_paediatric;
+				serviceTypeSelect.dataset.errorMessage = localizedErrorMessages.service_type_paediatric;
 				showError("service_type");
 				return false;
 			}
@@ -326,7 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		const remainingCharacters = 20 - value.length;
 
 		if (value.length < 20) {
-			healthConcernTextarea.dataset.errorMessage = errorMessages.health_concern.replace("X", remainingCharacters);
+			healthConcernTextarea.dataset.errorMessage = localizedErrorMessages.health_concern.replace("X", remainingCharacters);
 			showError("health_concern");
 			return false;
 		}
@@ -371,7 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const errorId = `${fieldName}_error`;
 		let errorElement = document.getElementById(errorId);
-		const message = targetElement?.dataset?.errorMessage || errorMessages[fieldName] || "";
+		const message = targetElement?.dataset?.errorMessage || localizedErrorMessages[fieldName] || "";
 
 		if (!errorElement) {
 			errorElement = document.createElement("span");
@@ -485,7 +508,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	firstNameInput.addEventListener("blur", validateFirstName);
 	lastNameInput.addEventListener("blur", validateLastName);
-	dateOfBirthInput.addEventListener("blur", validateDateOfBirth);
+	dateOfBirthInput.addEventListener("blur", () => {
+		validateDateOfBirth();
+
+		if (serviceTypeSelect.value !== "") {
+			validateServiceType();
+		}
+	});
 	emailInput.addEventListener("blur", validateEmail);
 	phoneInput.addEventListener("blur", validatePhone);
 	preferredDateInput.addEventListener("blur", validatePreferredDate);
