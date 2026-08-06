@@ -467,7 +467,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 
 		const formattedClosingTime = closingHour === 18 ? "6pm" : "7pm";
-		warningElement.textContent = `${preferredClinicSelect.value} closes at ${formattedClosingTime} on weekdays, so evening appointments may be unavailable.`;
+		warningElement.textContent = currentLanguage === "es"
+			? `${preferredClinicSelect.value} cierra a las ${formattedClosingTime} entre semana, por lo que las citas en horario nocturno podrían no estar disponibles.`
+			: `${preferredClinicSelect.value} closes at ${formattedClosingTime} on weekdays, so evening appointments may be unavailable.`;
 	}
 
 	function toggleInsuranceFields() {
