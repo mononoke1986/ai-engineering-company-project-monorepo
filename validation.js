@@ -45,104 +45,348 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// Validation Functions
 	function validateFirstName() {
-		// Validate first_name field.
+		const value = firstNameInput.value.trim();
+		const normalizedLength = value.replace(/\s+/g, "").length;
+		const isValid = /^[A-Za-zÀ-ÖØ-öø-ÿÑñ ]+$/.test(value) && normalizedLength >= 2;
+
+		if (!isValid) {
+			showError("first_name");
+			return false;
+		}
+
+		clearError("first_name");
 		return true;
 	}
 
 	function validateLastName() {
-		// Validate last_name field.
+		const value = lastNameInput.value.trim();
+		const normalizedLength = value.replace(/\s+/g, "").length;
+		const isValid = /^[A-Za-zÀ-ÖØ-öø-ÿÑñ ]+$/.test(value) && normalizedLength >= 2;
+
+		if (!isValid) {
+			showError("last_name");
+			return false;
+		}
+
+		clearError("last_name");
 		return true;
 	}
 
 	function validateDateOfBirth() {
-		// Validate date_of_birth field.
+		const value = dateOfBirthInput.value;
+		const birthDate = value ? new Date(`${value}T00:00:00`) : null;
+		const today = new Date();
+		let isValid = false;
+
+		if (birthDate instanceof Date && !Number.isNaN(birthDate?.getTime())) {
+			let age = today.getFullYear() - birthDate.getFullYear();
+			const monthDifference = today.getMonth() - birthDate.getMonth();
+
+			if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+				age -= 1;
+			}
+
+			isValid = age >= 0 && age <= 120;
+		}
+
+		if (!isValid) {
+			showError("date_of_birth");
+			return false;
+		}
+
+		clearError("date_of_birth");
 		return true;
 	}
 
 	function validateEmail() {
-		// Validate email field.
+		const value = emailInput.value.trim();
+		const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+		if (!isValid) {
+			showError("email");
+			return false;
+		}
+
+		clearError("email");
 		return true;
 	}
 
 	function validatePhone() {
-		// Validate phone field.
+		const value = phoneInput.value.trim();
+		const isValid = /^\+[\d\s().-]{6,}$/.test(value);
+
+		if (!isValid) {
+			showError("phone");
+			return false;
+		}
+
+		clearError("phone");
 		return true;
 	}
 
 	function validatePreferredLanguage() {
-		// Validate preferred_language field.
+		if (preferredLanguageSelect.value === "") {
+			showError("preferred_language");
+			return false;
+		}
+
+		clearError("preferred_language");
 		return true;
 	}
 
 	function validatePreferredClinic() {
-		// Validate preferred_clinic field.
+		if (preferredClinicSelect.value === "") {
+			showError("preferred_clinic");
+			return false;
+		}
+
+		clearError("preferred_clinic");
 		return true;
 	}
 
 	function validatePreferredDate() {
-		// Validate preferred_date field.
+		const value = preferredDateInput.value;
+		const selectedDate = value ? new Date(`${value}T00:00:00`) : null;
+		const today = new Date();
+		const baseDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+		const maxDate = new Date(baseDate);
+		let minBusinessDate = new Date(baseDate);
+
+		minBusinessDate.setDate(minBusinessDate.getDate() + 1);
+		while (minBusinessDate.getDay() === 0 || minBusinessDate.getDay() === 6) {
+			minBusinessDate.setDate(minBusinessDate.getDate() + 1);
+		}
+
+		maxDate.setDate(maxDate.getDate() + 60);
+
+		const isValid =
+			selectedDate instanceof Date &&
+			!Number.isNaN(selectedDate?.getTime()) &&
+			selectedDate >= minBusinessDate &&
+			selectedDate <= maxDate;
+
+		if (!isValid) {
+			showError("preferred_date");
+			return false;
+		}
+
+		clearError("preferred_date");
 		return true;
 	}
 
 	function validatePreferredTime() {
-		// Validate preferred_time field.
+		if (preferredTimeSelect.value === "") {
+			showError("preferred_time");
+			return false;
+		}
+
+		clearError("preferred_time");
 		return true;
 	}
 
 	function validateServiceType() {
-		// Validate service_type field.
+		const value = serviceTypeSelect.value;
+
+		delete serviceTypeSelect.dataset.errorMessage;
+
+		if (value === "") {
+			showError("service_type");
+			return false;
+		}
+
+		if (value === "Paediatric Care" && dateOfBirthInput.value) {
+			const birthDate = new Date(`${dateOfBirthInput.value}T00:00:00`);
+			const today = new Date();
+			let age = today.getFullYear() - birthDate.getFullYear();
+			const monthDifference = today.getMonth() - birthDate.getMonth();
+
+			if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+				age -= 1;
+			}
+
+			if (!Number.isNaN(birthDate.getTime()) && age >= 18) {
+				serviceTypeSelect.dataset.errorMessage = errorMessages.service_type_paediatric;
+				showError("service_type");
+				return false;
+			}
+		}
+
+		clearError("service_type");
+		delete serviceTypeSelect.dataset.errorMessage;
 		return true;
 	}
 
 	function validateHasInsurance() {
-		// Validate has_insurance field.
+		const selectedOption = document.querySelector('input[name="has_insurance"]:checked');
+
+		if (!selectedOption) {
+			showError("has_insurance");
+			return false;
+		}
+
+		clearError("has_insurance");
 		return true;
 	}
 
 	function validateInsuranceProvider() {
-		// Validate insurance_provider field.
+		const selectedOption = document.querySelector('input[name="has_insurance"]:checked');
+
+		if (!selectedOption || selectedOption.value === "No") {
+			clearError("insurance_provider");
+			return true;
+		}
+
+		if (insuranceProviderInput.value.trim() === "") {
+			showError("insurance_provider");
+			return false;
+		}
+
+		clearError("insurance_provider");
 		return true;
 	}
 
 	function validateInsuranceMemberId() {
-		// Validate insurance_member_id field.
+		const selectedOption = document.querySelector('input[name="has_insurance"]:checked');
+
+		if (!selectedOption || selectedOption.value === "No") {
+			clearError("insurance_member_id");
+			return true;
+		}
+
+		const value = insuranceMemberIdInput.value.trim();
+		const isValid = /^[A-Za-z0-9]{6,20}$/.test(value);
+
+		if (!isValid) {
+			showError("insurance_member_id");
+			return false;
+		}
+
+		clearError("insurance_member_id");
 		return true;
 	}
 
 	function validatePatientId() {
-		// Validate patient_id field for returning patients.
+		const selectedOption = document.querySelector('input[name="new_patient"]:checked');
+
+		if (!selectedOption) {
+			showError("new_patient");
+			clearError("patient_id");
+			return false;
+		}
+
+		clearError("new_patient");
+
+		if (selectedOption.value !== "No") {
+			clearError("patient_id");
+			return true;
+		}
+
+		if (patientIdInput.value.trim() === "") {
+			showError("patient_id");
+			return false;
+		}
+
+		clearError("patient_id");
 		return true;
 	}
 
 	function validateHealthConcern() {
-		// Validate health_concern field.
+		const value = healthConcernTextarea.value.trim();
+		const remainingCharacters = 20 - value.length;
+
+		if (value.length < 20) {
+			healthConcernTextarea.dataset.errorMessage = errorMessages.health_concern.replace("X", remainingCharacters);
+			showError("health_concern");
+			return false;
+		}
+
+		clearError("health_concern");
+		delete healthConcernTextarea.dataset.errorMessage;
 		return true;
 	}
 
 	function validateConsent() {
-		// Validate contact_consent field.
+		if (!contactConsentCheckbox.checked) {
+			showError("contact_consent");
+			return false;
+		}
+
+		clearError("contact_consent");
 		return true;
 	}
 
 	// Helper Functions
-	function showError() {
-		// Display the appropriate error message for a field.
+	function showError(fieldName) {
+		let targetElement;
+		let anchorElement;
+
+		switch (fieldName) {
+			case "new_patient":
+				targetElement = newPatientRadios[0]?.closest("fieldset");
+				anchorElement = targetElement;
+				break;
+			case "has_insurance":
+				targetElement = hasInsuranceRadios[0]?.closest("fieldset");
+				anchorElement = targetElement;
+				break;
+			default:
+				targetElement = document.getElementById(fieldName);
+				anchorElement = targetElement;
+		}
+
+		if (!anchorElement) {
+			return;
+		}
+
+		const errorId = `${fieldName}_error`;
+		let errorElement = document.getElementById(errorId);
+		const message = targetElement?.dataset?.errorMessage || errorMessages[fieldName] || "";
+
+		if (!errorElement) {
+			errorElement = document.createElement("span");
+			errorElement.id = errorId;
+			anchorElement.insertAdjacentElement("afterend", errorElement);
+		}
+
+		errorElement.textContent = message;
 	}
 
-	function clearError() {
-		// Clear the error message for a field.
+	function clearError(fieldName) {
+		const errorElement = document.getElementById(`${fieldName}_error`);
+
+		if (errorElement) {
+			errorElement.remove();
+		}
 	}
 
 	function updateCharacterCounter() {
-		// Update the live character count for health_concern.
+		charCount.textContent = healthConcernTextarea.value.length;
 	}
 
 	function toggleInsuranceFields() {
-		// Show or hide insuranceFields based on has_insurance selection.
+		const selectedOption = document.querySelector('input[name="has_insurance"]:checked');
+		const shouldShow = selectedOption?.value === "Yes";
+
+		insuranceFields.classList.toggle("hidden", !shouldShow);
+
+		if (!shouldShow) {
+			insuranceProviderInput.value = "";
+			insuranceMemberIdInput.value = "";
+			clearError("insurance_provider");
+			clearError("insurance_member_id");
+		}
 	}
 
 	function togglePatientIdField() {
-		// Show or hide patientIdField based on new_patient selection.
+		const selectedOption = document.querySelector('input[name="new_patient"]:checked');
+		const shouldShow = selectedOption?.value === "No";
+
+		patientIdField.classList.toggle("hidden", !shouldShow);
+
+		if (!shouldShow) {
+			patientIdInput.value = "";
+			clearError("patient_id");
+		}
 	}
 
 	// Event Listeners
@@ -192,21 +436,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// Submit Handler
 	form.addEventListener("submit", (event) => {
-		validateFirstName();
-		validateLastName();
-		validateDateOfBirth();
-		validateEmail();
-		validatePhone();
-		validatePreferredLanguage();
-		validatePreferredClinic();
-		validatePreferredDate();
-		validatePreferredTime();
-		validateServiceType();
-		validateHasInsurance();
-		validateInsuranceProvider();
-		validateInsuranceMemberId();
-		validatePatientId();
-		validateHealthConcern();
-		validateConsent();
+		const isFirstNameValid = validateFirstName();
+		const isLastNameValid = validateLastName();
+		const isDateOfBirthValid = validateDateOfBirth();
+		const isEmailValid = validateEmail();
+		const isPhoneValid = validatePhone();
+		const isPreferredLanguageValid = validatePreferredLanguage();
+		const isPreferredClinicValid = validatePreferredClinic();
+		const isPreferredDateValid = validatePreferredDate();
+		const isPreferredTimeValid = validatePreferredTime();
+		const isServiceTypeValid = validateServiceType();
+		const isHasInsuranceValid = validateHasInsurance();
+		const isInsuranceProviderValid = validateInsuranceProvider();
+		const isInsuranceMemberIdValid = validateInsuranceMemberId();
+		const isPatientIdValid = validatePatientId();
+		const isHealthConcernValid = validateHealthConcern();
+		const isConsentValid = validateConsent();
+
+		const isFormValid =
+			isFirstNameValid &&
+			isLastNameValid &&
+			isDateOfBirthValid &&
+			isEmailValid &&
+			isPhoneValid &&
+			isPreferredLanguageValid &&
+			isPreferredClinicValid &&
+			isPreferredDateValid &&
+			isPreferredTimeValid &&
+			isServiceTypeValid &&
+			isHasInsuranceValid &&
+			isInsuranceProviderValid &&
+			isInsuranceMemberIdValid &&
+			isPatientIdValid &&
+			isHealthConcernValid &&
+			isConsentValid;
+
+		if (!isFormValid) {
+			event.preventDefault();
+		}
 	});
 });
