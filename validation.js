@@ -21,11 +21,19 @@ document.addEventListener("DOMContentLoaded", () => {
 	const healthConcernTextarea = document.getElementById("health_concern");
 	const charCount = document.getElementById("charCount");
 	const contactConsentCheckbox = document.getElementById("contact_consent");
+	const clinicClosingTimes = {
+		"HealthCore Austin Central": 20,
+		"HealthCore Austin North": 19,
+		"HealthCore San Antonio": 18,
+		"HealthCore Miami": 20,
+		"HealthCore Orlando": 18,
+		"HealthCore Atlanta": 19
+	};
 
 	// Error Messages
 	const errorMessages = {
-		first_name: "First name must contain only letters and be at least 2 characters long",
-		last_name: "Last name must contain only letters and be at least 2 characters long",
+		first_name: "First name must contain only letters and be between 2 and 50 characters long, excluding spaces",
+		last_name: "Last name must contain only letters and be between 2 and 50 characters long, excluding spaces",
 		date_of_birth: "Enter a valid date of birth. Patient age must be between 0 and 120 years.",
 		email: "Enter a valid email address (example: name@provider.com)",
 		phone: "Phone number must include a country code (example: +1 305 555 0191)",
@@ -39,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		has_insurance: "Indicate whether you have health insurance",
 		insurance_provider: "Enter your insurance provider",
 		insurance_member_id: "Member ID must contain 6 to 20 alphanumeric characters",
+		patient_id: "Patient ID must match the format HC- followed by exactly 6 letters or numbers",
 		health_concern: "Describe your medical concern using at least 20 characters (X characters remaining)",
 		contact_consent: "You must consent to being contacted before submitting the form"
 	};
@@ -47,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	function validateFirstName() {
 		const value = firstNameInput.value.trim();
 		const normalizedLength = value.replace(/\s+/g, "").length;
-		const isValid = /^[A-Za-zÀ-ÖØ-öø-ÿÑñ ]+$/.test(value) && normalizedLength >= 2;
+		const isValid = /^[A-Za-zÀ-ÖØ-öø-ÿÑñ ]+$/.test(value) && normalizedLength >= 2 && normalizedLength <= 50;
 
 		if (!isValid) {
 			showError("first_name");
@@ -61,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	function validateLastName() {
 		const value = lastNameInput.value.trim();
 		const normalizedLength = value.replace(/\s+/g, "").length;
-		const isValid = /^[A-Za-zÀ-ÖØ-öø-ÿÑñ ]+$/.test(value) && normalizedLength >= 2;
+		const isValid = /^[A-Za-zÀ-ÖØ-öø-ÿÑñ ]+$/.test(value) && normalizedLength >= 2 && normalizedLength <= 50;
 
 		if (!isValid) {
 			showError("last_name");
@@ -281,7 +290,14 @@ document.addEventListener("DOMContentLoaded", () => {
 			return true;
 		}
 
-		if (patientIdInput.value.trim() === "") {
+		const value = patientIdInput.value.trim();
+
+		if (value === "") {
+			showError("patient_id");
+			return false;
+		}
+
+		if (!/^HC-[A-Za-z0-9]{6}$/.test(value)) {
 			showError("patient_id");
 			return false;
 		}
@@ -363,6 +379,29 @@ document.addEventListener("DOMContentLoaded", () => {
 		charCount.textContent = healthConcernTextarea.value.length;
 	}
 
+	function updateTimeClinicWarning() {
+		const existingWarning = document.getElementById("time_clinic_warning");
+		const isEveningSlot = preferredTimeSelect.value === "Evening (5pm-8pm)";
+		const closingHour = clinicClosingTimes[preferredClinicSelect.value];
+		const shouldWarn = isEveningSlot && typeof closingHour === "number" && closingHour < 20;
+
+		if (!shouldWarn) {
+			existingWarning?.remove();
+			return;
+		}
+
+		let warningElement = existingWarning;
+
+		if (!warningElement) {
+			warningElement = document.createElement("p");
+			warningElement.id = "time_clinic_warning";
+			preferredTimeSelect.closest("p")?.insertAdjacentElement("afterend", warningElement);
+		}
+
+		const formattedClosingTime = closingHour === 18 ? "6pm" : "7pm";
+		warningElement.textContent = `${preferredClinicSelect.value} closes at ${formattedClosingTime} on weekdays, so evening appointments may be unavailable.`;
+	}
+
 	function toggleInsuranceFields() {
 		const selectedOption = document.querySelector('input[name="has_insurance"]:checked');
 		const shouldShow = selectedOption?.value === "Yes";
@@ -408,9 +447,15 @@ document.addEventListener("DOMContentLoaded", () => {
 	healthConcernTextarea.addEventListener("blur", validateHealthConcern);
 
 	preferredLanguageSelect.addEventListener("change", validatePreferredLanguage);
-	preferredClinicSelect.addEventListener("change", validatePreferredClinic);
+	preferredClinicSelect.addEventListener("change", () => {
+		validatePreferredClinic();
+		updateTimeClinicWarning();
+	});
 	preferredDateInput.addEventListener("change", validatePreferredDate);
-	preferredTimeSelect.addEventListener("change", validatePreferredTime);
+	preferredTimeSelect.addEventListener("change", () => {
+		validatePreferredTime();
+		updateTimeClinicWarning();
+	});
 	serviceTypeSelect.addEventListener("change", validateServiceType);
 	contactConsentCheckbox.addEventListener("change", validateConsent);
 
