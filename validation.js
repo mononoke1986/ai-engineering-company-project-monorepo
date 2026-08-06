@@ -361,6 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		if (!errorElement) {
 			errorElement = document.createElement("span");
 			errorElement.id = errorId;
+			errorElement.setAttribute("aria-live", "polite");
 			anchorElement.insertAdjacentElement("afterend", errorElement);
 		}
 
