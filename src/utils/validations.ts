@@ -13,3 +13,22 @@ export function isValidEmail(email: string): boolean {
 export function isValidPhone(phone: string): boolean {
   return /^\+\d{1,3}[\s-]?\d[\d\s-]{5,13}\d$/.test(phone.trim());
 }
+
+export function isValidDateOfBirth(
+  dateOfBirth: string,
+  today: Date
+): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) {
+    return false;
+  }
+  const birth = new Date(dateOfBirth);
+  if (Number.isNaN(birth.getTime())) {
+    return false;
+  }
+  if (birth > today) {
+    return false;
+  }
+  const oldestAllowed = new Date(today);
+  oldestAllowed.setFullYear(today.getFullYear() - 120);
+  return birth >= oldestAllowed;
+}
