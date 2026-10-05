@@ -32,3 +32,34 @@ export function isValidDateOfBirth(
   oldestAllowed.setFullYear(today.getFullYear() - 120);
   return birth >= oldestAllowed;
 }
+
+function getNextBusinessDay(from: Date): Date {
+  const next = new Date(from);
+  next.setHours(0, 0, 0, 0);
+  do {
+    next.setDate(next.getDate() + 1);
+  } while (next.getDay() === 0 || next.getDay() === 6);
+  return next;
+}
+
+export function isValidPreferredDate(
+  preferredDate: string,
+  today: Date
+): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(preferredDate)) {
+    return false;
+  }
+  const [year, month, day] = preferredDate.split("-").map(Number);
+  if (year === undefined || month === undefined || day === undefined) {
+    return false;
+  }
+  const chosen = new Date(year, month - 1, day);
+  if (Number.isNaN(chosen.getTime())) {
+    return false;
+  }
+  const earliest = getNextBusinessDay(today);
+  const latest = new Date(today);
+  latest.setHours(0, 0, 0, 0);
+  latest.setDate(latest.getDate() + 60);
+  return chosen >= earliest && chosen <= latest;
+}
