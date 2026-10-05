@@ -5,3 +5,7 @@ export function isValidName(name: string): boolean {
   }
   return /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$/.test(trimmed);
 }
+
+export function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
