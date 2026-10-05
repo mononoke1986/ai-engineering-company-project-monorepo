@@ -23,3 +23,15 @@ export function countInquiriesByService(
     {}
   );
 }
+
+export function percentageWithInsurance(
+  inquiries: PatientInquiry[]
+): number {
+  if (inquiries.length === 0) {
+    return 0;
+  }
+  const withInsurance = inquiries.filter(
+    inquiry => inquiry.has_insurance === "Yes"
+  ).length;
+  return (withInsurance / inquiries.length) * 100;
+}
