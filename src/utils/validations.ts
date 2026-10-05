@@ -63,3 +63,22 @@ export function isValidPreferredDate(
   latest.setDate(latest.getDate() + 60);
   return chosen >= earliest && chosen <= latest;
 }
+
+export function isValidHealthConcern(text: string): boolean {
+  const length = text.trim().length;
+  return length >= 20 && length <= 500;
+}
+
+export function isValidInsuranceMemberId(memberId: string): boolean {
+  return /^[A-Za-z0-9]{6,20}$/.test(memberId.trim());
+}
+
+export function isUnder18(dateOfBirth: string, today: Date): boolean {
+  const birth = new Date(dateOfBirth);
+  if (Number.isNaN(birth.getTime())) {
+    return false;
+  }
+  const eighteenthBirthday = new Date(birth);
+  eighteenthBirthday.setFullYear(birth.getFullYear() + 18);
+  return eighteenthBirthday > today;
+}
