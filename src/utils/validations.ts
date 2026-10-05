@@ -9,3 +9,7 @@ export function isValidName(name: string): boolean {
 export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
+
+export function isValidPhone(phone: string): boolean {
+  return /^\+\d{1,3}[\s-]?\d[\d\s-]{5,13}\d$/.test(phone.trim());
+}
