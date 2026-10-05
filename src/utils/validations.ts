@@ -1,3 +1,5 @@
+import type { PatientInquiry } from "../types/models";
+
 export function isValidName(name: string): boolean {
   const trimmed = name.trim();
   if (trimmed.length < 2 || trimmed.length > 50) {
@@ -82,3 +84,45 @@ export function isUnder18(dateOfBirth: string, today: Date): boolean {
   eighteenthBirthday.setFullYear(birth.getFullYear() + 18);
   return eighteenthBirthday > today;
 }
+
+export function validateInquiry(
+  inquiry: PatientInquiry,
+  today: Date
+): string[] {
+  const errors: string[] = [];
+
+  if (!isValidName(inquiry.first_name)) errors.push("first_name");
+  if (!isValidName(inquiry.last_name)) errors.push("last_name");
+  if (!isValidDateOfBirth(inquiry.date_of_birth, today)) {
+    errors.push("date_of_birth");
+  }
+  if (!isValidEmail(inquiry.email)) errors.push("email");
+  if (!isValidPhone(inquiry.phone)) errors.push("phone");
+  if (!isValidPreferredDate(inquiry.preferred_date, today)) {
+    errors.push("preferred_date");
+  }
+  if (
+    inquiry.service_type === "Paediatric Care" &&
+    !isUnder18(inquiry.date_of_birth, today)
+  ) {
+    errors.push("service_type");
+  }
+  if (inquiry.has_insurance === "Yes") {
+    if (!inquiry.insurance_provider || inquiry.insurance_provider.trim().length === 0 || inquiry.insurance_provider.length > 100) {
+      errors.push("insurance_provider");
+    }
+    if (
+      inquiry.insurance_member_id === undefined ||
+      !isValidInsuranceMemberId(inquiry.insurance_member_id)
+    ) {
+      errors.push("insurance_member_id");
+    }
+  }
+  if (!isValidHealthConcern(inquiry.health_concern)) {
+    errors.push("health_concern");
+  }
+  if (!inquiry.contact_consent) errors.push("contact_consent");
+
+  return errors;
+}
+
