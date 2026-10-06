@@ -23,3 +23,13 @@ export function sortByLastName(
     return order === "asc" ? result : -result;
   });
 }
+
+export function sortByPreferredDate(
+  inquiries: PatientInquiry[],
+  order: "asc" | "desc"
+): PatientInquiry[] {
+  return [...inquiries].sort((a, b) => {
+    const result = a.preferred_date.localeCompare(b.preferred_date);
+    return order === "asc" ? result : -result;
+  });
+}
