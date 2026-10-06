@@ -306,3 +306,8 @@ This template was built as part of the 4Geeks Academy AI Engineering Career Prog
 You can find other templates and resources like this at the [4Geeks Academy GitHub page](https://github.com/4geeksacademy).
 
 _This template is maintained by 4Geeks Academy for the AI Engineering track. For exclusive use in the programme._
+
+## Validar y ejecutar el código TypeScript
+
+- Revisar tipos: `npm run typecheck`
+- Ejecutar el demo: `npx tsx src/demo.ts`
