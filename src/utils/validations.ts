@@ -85,6 +85,10 @@ export function isUnder18(dateOfBirth: string, today: Date): boolean {
   return eighteenthBirthday > today;
 }
 
+export function isValidPatientId(patientId: string): boolean {
+  return /^HC-[A-Za-z0-9]{6}$/.test(patientId.trim());
+}
+
 export function validateInquiry(
   inquiry: PatientInquiry,
   today: Date
@@ -108,7 +112,11 @@ export function validateInquiry(
     errors.push("service_type");
   }
   if (inquiry.has_insurance === "Yes") {
-    if (!inquiry.insurance_provider || inquiry.insurance_provider.trim().length === 0 || inquiry.insurance_provider.length > 100) {
+    if (
+      !inquiry.insurance_provider ||
+      inquiry.insurance_provider.trim().length === 0 ||
+      inquiry.insurance_provider.length > 100
+    ) {
       errors.push("insurance_provider");
     }
     if (
@@ -118,6 +126,14 @@ export function validateInquiry(
       errors.push("insurance_member_id");
     }
   }
+  if (
+    inquiry.new_patient === "No" &&
+    inquiry.patient_id !== undefined &&
+    inquiry.patient_id.trim() !== "" &&
+    !isValidPatientId(inquiry.patient_id)
+  ) {
+    errors.push("patient_id");
+  }
   if (!isValidHealthConcern(inquiry.health_concern)) {
     errors.push("health_concern");
   }
@@ -125,4 +141,3 @@ export function validateInquiry(
 
   return errors;
 }
-
