@@ -1,0 +1,26 @@
+[project]
+name = "api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Tatiana Vega", email = "108529000+mononoke1986@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "email-validator>=2.3.0",
+    "fastapi>=0.161.1",
+    "libpass[bcrypt]>=1.9.4",
+    "python-dotenv>=1.2.4",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.32",
+    "tinydb>=4.9.0",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[project.scripts]
+api = "api:main"
+
+[build-system]
+requires = ["uv_build>=0.13.5,<0.14.0"]
+build-backend = "uv_build"
