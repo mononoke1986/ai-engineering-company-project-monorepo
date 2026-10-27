@@ -1,40 +1,39 @@
-import type { PatientInquiry, Clinic, ClinicName } from "../types/models";
+import type { Claim, Clinician } from "../types";
 
-export function findInquiryByEmail(
-  inquiries: PatientInquiry[],
-  email: string
-): number {
-  const target = email.toLowerCase();
-  for (let i = 0; i < inquiries.length; i++) {
-    const inquiry = inquiries[i];
-    if (inquiry !== undefined && inquiry.email.toLowerCase() === target) {
-      return i;
-    }
+export function findClaimById(claims: Claim[], claimId: string): Claim | null {
+  for (const claim of claims) {
+    if (claim.claimId === claimId) return claim;
   }
-  return -1;
+  return null;
 }
 
-export function binarySearchClinicByName(
-  clinics: Clinic[],
-  name: ClinicName
-): number {
-  let low = 0;
-  let high = clinics.length - 1;
+export function findClinicianById(
+  clinicians: Clinician[],
+  clinicianId: string
+): Clinician | null {
+  for (const clinician of clinicians) {
+    if (clinician.clinicianId === clinicianId) return clinician;
+  }
+  return null;
+}
 
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2);
-    const current = clinics[mid];
-    if (current === undefined) {
-      return -1;
-    }
-    const comparison = current.name.localeCompare(name);
-    if (comparison === 0) {
-      return mid;
-    }
-    if (comparison < 0) {
-      low = mid + 1;
+/** Requiere que sortedClaims esté ordenado ascendente por claimId. */
+export function binarySearchClaimById(
+  sortedClaims: Claim[],
+  targetId: string
+): number {
+  let left = 0;
+  let right = sortedClaims.length - 1;
+
+  while (left <= right) {
+    const middle = Math.floor((left + right) / 2);
+    const middleId = sortedClaims[middle]?.claimId;
+
+    if (middleId === targetId) return middle;
+    if (middleId !== undefined && middleId < targetId) {
+      left = middle + 1;
     } else {
-      high = mid - 1;
+      right = middle - 1;
     }
   }
   return -1;

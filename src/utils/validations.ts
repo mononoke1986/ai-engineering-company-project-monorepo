@@ -1,143 +1,118 @@
-import type { PatientInquiry } from "../types/models";
+import type {
+  Appointment,
+  AppointmentValidationResult,
+  Claim,
+  Clinician,
+  ClinicianRole,
+  ValidationResult,
+} from "../types";
+import { DEFAULT_DENIAL_THRESHOLD, DEFAULT_NO_SHOW_THRESHOLD } from "./constants";
+import { parseIsoDate, todayIsoDate } from "./dates";
 
-export function isValidName(name: string): boolean {
-  const trimmed = name.trim();
-  if (trimmed.length < 2 || trimmed.length > 50) {
-    return false;
-  }
-  return /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$/.test(trimmed);
+const PATIENT_ID_FORMAT = /^HC-[A-Za-z0-9]{6}$/;
+const TIME_FORMAT = /^([01]\d|2[0-3]):[0-5]\d$/;
+const VALID_ROLES: ClinicianRole[] = [
+  "physician",
+  "nurse_practitioner",
+  "nurse",
+  "medical_assistant",
+];
+
+function buildResult(errors: string[]): ValidationResult {
+  return { valid: errors.length === 0, errors };
 }
 
-export function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-}
-
-export function isValidPhone(phone: string): boolean {
-  return /^\+\d{1,3}[\s-]?\d[\d\s-]{5,13}\d$/.test(phone.trim());
-}
-
-export function isValidDateOfBirth(
-  dateOfBirth: string,
-  today: Date
-): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) {
-    return false;
-  }
-  const birth = new Date(dateOfBirth);
-  if (Number.isNaN(birth.getTime())) {
-    return false;
-  }
-  if (birth > today) {
-    return false;
-  }
-  const oldestAllowed = new Date(today);
-  oldestAllowed.setFullYear(today.getFullYear() - 120);
-  return birth >= oldestAllowed;
-}
-
-function getNextBusinessDay(from: Date): Date {
-  const next = new Date(from);
-  next.setHours(0, 0, 0, 0);
-  do {
-    next.setDate(next.getDate() + 1);
-  } while (next.getDay() === 0 || next.getDay() === 6);
-  return next;
-}
-
-export function isValidPreferredDate(
-  preferredDate: string,
-  today: Date
-): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(preferredDate)) {
-    return false;
-  }
-  const [year, month, day] = preferredDate.split("-").map(Number);
-  if (year === undefined || month === undefined || day === undefined) {
-    return false;
-  }
-  const chosen = new Date(year, month - 1, day);
-  if (Number.isNaN(chosen.getTime())) {
-    return false;
-  }
-  const earliest = getNextBusinessDay(today);
-  const latest = new Date(today);
-  latest.setHours(0, 0, 0, 0);
-  latest.setDate(latest.getDate() + 60);
-  return chosen >= earliest && chosen <= latest;
-}
-
-export function isValidHealthConcern(text: string): boolean {
-  const length = text.trim().length;
-  return length >= 20 && length <= 500;
-}
-
-export function isValidInsuranceMemberId(memberId: string): boolean {
-  return /^[A-Za-z0-9]{6,20}$/.test(memberId.trim());
-}
-
-export function isUnder18(dateOfBirth: string, today: Date): boolean {
-  const birth = new Date(dateOfBirth);
-  if (Number.isNaN(birth.getTime())) {
-    return false;
-  }
-  const eighteenthBirthday = new Date(birth);
-  eighteenthBirthday.setFullYear(birth.getFullYear() + 18);
-  return eighteenthBirthday > today;
-}
-
-export function isValidPatientId(patientId: string): boolean {
-  return /^HC-[A-Za-z0-9]{6}$/.test(patientId.trim());
-}
-
-export function validateInquiry(
-  inquiry: PatientInquiry,
-  today: Date
-): string[] {
+export function validateClaim(
+  claim: Claim,
+  knownLocationIds: string[],
+  now: Date = new Date()
+): ValidationResult {
   const errors: string[] = [];
 
-  if (!isValidName(inquiry.first_name)) errors.push("first_name");
-  if (!isValidName(inquiry.last_name)) errors.push("last_name");
-  if (!isValidDateOfBirth(inquiry.date_of_birth, today)) {
-    errors.push("date_of_birth");
+  if (!(claim.claimAmount > 0)) {
+    errors.push("claimAmount debe ser mayor que 0");
   }
-  if (!isValidEmail(inquiry.email)) errors.push("email");
-  if (!isValidPhone(inquiry.phone)) errors.push("phone");
-  if (!isValidPreferredDate(inquiry.preferred_date, today)) {
-    errors.push("preferred_date");
-  }
-  if (
-    inquiry.service_type === "Paediatric Care" &&
-    !isUnder18(inquiry.date_of_birth, today)
-  ) {
-    errors.push("service_type");
-  }
-  if (inquiry.has_insurance === "Yes") {
-    if (
-      !inquiry.insurance_provider ||
-      inquiry.insurance_provider.trim().length === 0 ||
-      inquiry.insurance_provider.length > 100
-    ) {
-      errors.push("insurance_provider");
-    }
-    if (
-      inquiry.insurance_member_id === undefined ||
-      !isValidInsuranceMemberId(inquiry.insurance_member_id)
-    ) {
-      errors.push("insurance_member_id");
-    }
-  }
-  if (
-    inquiry.new_patient === "No" &&
-    inquiry.patient_id !== undefined &&
-    inquiry.patient_id.trim() !== "" &&
-    !isValidPatientId(inquiry.patient_id)
-  ) {
-    errors.push("patient_id");
-  }
-  if (!isValidHealthConcern(inquiry.health_concern)) {
-    errors.push("health_concern");
-  }
-  if (!inquiry.contact_consent) errors.push("contact_consent");
 
-  return errors;
+  if (parseIsoDate(claim.submissionDate) === null) {
+    errors.push("submissionDate no es una fecha válida");
+  } else if (claim.submissionDate.slice(0, 10) > todayIsoDate(now)) {
+    errors.push("submissionDate no puede ser una fecha futura");
+  }
+
+  if (!knownLocationIds.includes(claim.locationId)) {
+    errors.push(`locationId "${claim.locationId}" no es una clínica conocida`);
+  }
+
+  if (claim.status === "denied" && claim.denialReason === undefined) {
+    errors.push("denialReason es obligatorio cuando status es \"denied\"");
+  }
+
+  if (!PATIENT_ID_FORMAT.test(claim.patientId)) {
+    errors.push("patientId debe tener el formato HC- seguido de 6 caracteres alfanuméricos");
+  }
+
+  return buildResult(errors);
+}
+
+export function validateAppointment(
+  appointment: Appointment,
+  knownLocationIds: string[]
+): AppointmentValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!TIME_FORMAT.test(appointment.scheduledTime)) {
+    errors.push("scheduledTime debe tener el formato HH:MM de 24 horas");
+  }
+
+  if (!knownLocationIds.includes(appointment.locationId)) {
+    errors.push(`locationId "${appointment.locationId}" no es una clínica conocida`);
+  }
+
+  if (appointment.status === "no_show" && !appointment.noShowReason) {
+    warnings.push("Falta noShowReason en una cita no_show");
+  }
+
+  return { ...buildResult(errors), warnings };
+}
+
+export function validateClinician(
+  clinician: Clinician,
+  now: Date = new Date()
+): ValidationResult {
+  const errors: string[] = [];
+
+  if (!(clinician.cmeHoursRequired >= 0)) {
+    errors.push("cmeHoursRequired debe ser mayor o igual a 0");
+  }
+
+  if (!(clinician.cmeHoursLogged >= 0)) {
+    errors.push("cmeHoursLogged debe ser mayor o igual a 0");
+  }
+
+  if (parseIsoDate(clinician.licenceExpiryDate) === null) {
+    errors.push("licenceExpiryDate no es una fecha válida");
+  } else if (clinician.licenceExpiryDate.slice(0, 10) < todayIsoDate(now)) {
+    errors.push("La licencia está vencida (licenceExpiryDate está en el pasado)");
+  }
+
+  if (!VALID_ROLES.includes(clinician.role)) {
+    errors.push(`role debe ser uno de: ${VALID_ROLES.join(", ")}`);
+  }
+
+  return buildResult(errors);
+}
+
+export function isDenialRateAboveThreshold(
+  rate: number,
+  threshold: number = DEFAULT_DENIAL_THRESHOLD
+): boolean {
+  return rate > threshold;
+}
+
+export function isNoShowRateAboveThreshold(
+  rate: number,
+  threshold: number = DEFAULT_NO_SHOW_THRESHOLD
+): boolean {
+  return rate > threshold;
 }
