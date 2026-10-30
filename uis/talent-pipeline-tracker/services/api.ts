@@ -44,7 +44,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ? { "Content-Type": "application/json" }
     : undefined;
 
-  const response = await fetch(`${API_URL}${path}`, { ...init, headers });
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}${path}`, { ...init, headers });
+  } catch {
+    throw new Error(
+      "No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo."
+    );
+  }
 
   if (!response.ok) {
     throw new Error(await readErrorMessage(response));
