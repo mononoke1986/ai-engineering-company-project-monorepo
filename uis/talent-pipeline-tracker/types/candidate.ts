@@ -24,8 +24,8 @@ export interface Candidate {
   email: string;
   phone: string;
   position: string;
-  linkedin_url: string;
-  cv_url: string;
+  linkedin_url: string | null;
+  cv_url: string | null;
   status: CandidateStatus;
   stage: CandidateStage;
   experience_years: number;
@@ -40,4 +40,26 @@ export interface CandidatesResponse {
   page: number;
   limit: number;
   data: Candidate[];
+}
+
+// Datos para registrar (POST) o reemplazar (PUT) una candidatura.
+// Obligatorios: full_name, email, phone, position, experience_years.
+export interface CandidateInput {
+  full_name: string;
+  email: string;
+  phone: string;
+  position: string;
+  experience_years: number;
+  linkedin_url?: string | null;
+  cv_url?: string | null;
+}
+
+// Datos para cambiar solo el estado y/o la etapa (PATCH).
+export interface CandidatePatch {
+  status?: CandidateStatus;
+  stage?: CandidateStage;
+}
+
+export interface NoteInput {
+  content: string;
 }
