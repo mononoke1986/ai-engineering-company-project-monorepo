@@ -8,7 +8,7 @@ import type { Note } from "@/types/candidate";
 
 interface NotesSectionProps {
   candidateId: string;
-  notes: Note[];
+  notes: Note[] | null;
   onChanged: () => Promise<void>;
 }
 
@@ -63,7 +63,8 @@ export function NotesSection({ candidateId, notes, onChanged }: NotesSectionProp
     }
   }
 
-  const newestFirst = [...notes].sort((a, b) =>
+  // El paracaídas: si notes es null o undefined, usamos un arreglo vacío []
+  const newestFirst = [...(notes || [])].sort((a, b) =>
     b.created_at.localeCompare(a.created_at)
   );
 

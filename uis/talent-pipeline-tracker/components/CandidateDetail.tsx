@@ -138,7 +138,7 @@ function CandidateView({ id }: { id: string }) {
         <StatusStageControls candidate={candidate} onUpdated={applyUpdate} />
         <NotesSection
           candidateId={candidate.id}
-          notes={candidate.notes}
+          notes={candidate.notes || []}
           onChanged={refresh}
         />
       </div>
