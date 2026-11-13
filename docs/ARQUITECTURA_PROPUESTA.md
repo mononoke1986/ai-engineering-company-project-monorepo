@@ -1,33 +1,39 @@
-# Propuesta de Arquitectura de Backend
+# Propuesta de Arquitectura de Backend - HealthCore
 
 ## 1. Contexto y Objetivo
-El objetivo de este documento es definir la arquitectura para el backend del sitio corporativo de [Escribe el nombre de tu empresa o proyecto, ej: TechNova]. Actualmente, el frontend ya está desplegado. Ahora necesitamos construir un backend robusto que gestione los datos de los usuarios, [menciona 1 o 2 cosas más, ej: los pedidos, los productos], y se comunique de forma segura con el frontend.
+HealthCore es una red de 12 clínicas ambulatorias en EE.UU. y Reino Unido. Actualmente, la empresa sufre de una fragmentación crítica: utilizamos dos sistemas de historia clínica electrónica (EHR) distintos que no se comunican, una plataforma de facturación en EE.UU., una hoja de cálculo en Reino Unido, y agendas manuales. No existe una capa de datos compartida.
+El objetivo de este backend es unificar el acceso a los datos (pacientes, citas, facturación) y servir como base para las herramientas de IA (predicción de no-shows, asistencia de facturación, etc.), garantizando el cumplimiento estricto de HIPAA y UK GDPR.
 
 ## 2. Patrón Arquitectónico Propuesto
-**Patrón Elegido:** Arquitectura en Capas (Layered Architecture) combinada con una organización por dominios.
+**Patrón Elegido:** Monolito Modular con Arquitectura en Capas (Layered Architecture) organizado por Dominios de Negocio (Domain-Driven Design).
 
-**Justificación:** 
-No elegimos este patrón por moda, sino porque se adapta a la naturaleza de nuestro negocio. Nuestro sistema maneja diferentes áreas (como usuarios y datos corporativos). La arquitectura en capas nos permite separar las responsabilidades de la misma forma en que funciona un restaurante:
-- **Capa de API (Routers):** Son los meseros, reciben el pedido del cliente (el frontend).
-- **Capa de Servicio (Services):** Es el chef, contiene la lógica y las reglas del negocio.
-- **Capa de Repositorio (Repositories):** Es la despensa, se encarga de guardar y buscar los datos en la base de datos.
-Esto garantiza que, si el día de mañana cambiamos la base de datos, no tengamos que romper la lógica de negocio ni los endpoints.
+**Justificación:**
+Dado que el equipo de tecnología es de solo 6 personas (CTO James Osei), proponer microservicios sería un error. Un Monolito Modular es ideal:
+1. **Separación de responsabilidades por dominio:** Nuestro sistema tiene áreas muy distintas (Clínica, Facturación, Cumplimiento, RRHH). La arquitectura en capas (Routers -> Services -> Repositories) asegura que la lógica de negocio de facturación (Revenue Cycle) no se mezcle con la lógica clínica.
+2. **Seguridad y Auditoría:** Al manejar datos protegidos por HIPAA y GDPR, necesitamos centralizar las reglas de acceso. Una capa de servicio robusta nos permite auditar quién consulta qué dato antes de que llegue a la base de datos.
+3. **Integración:** Necesitamos una capa de integración clara que "traduzca" los datos de los dos EHRs (EE.UU. y UK) a un formato estándar unificado para nuestro frontend y modelos de IA.
 
-## 3. Estructura de Carpetas Propuesta
-Para evitar que el proyecto sea un caos, organizaremos el código por **dominios** (Feature-based), no por tipos de archivos. 
+## 3. Estructura de Carpetas y Módulos (Dominios)
+Organizaremos el código por áreas de negocio (Vertical Slicing) para reflejar la estructura de HealthCore.
 
 ```text
 /app
- ├── main.py              # Punto de entrada de la app
- ├── core/                # Configuración global (seguridad, base de datos)
- │   ├── config.py
- │   └── database.py
- ├── users/               # Dominio: Usuarios
- │   ├── router.py        # Endpoints de usuarios
- │   ├── schemas.py       # Modelos de validación (Pydantic)
- │   ├── models.py        # Modelos de base de datos
- │   ├── service.py       # Lógica de negocio
- │   └── repository.py    # Consultas a la base de datos
- ├── [otro_dominio]/      # Ejemplo: pedidos, productos, etc.
- │   ├── router.py
+ ├── main.py                  # Punto de entrada
+ ├── core/                    # Configuración, seguridad, middleware de auditoría (GDPR/HIPAA)
+ ├── clinical/                # Dominio: Operaciones Clínicas y EHRs
+ │   ├── router.py            # Endpoints para historias clínicas unificadas
+ │   ├── schemas.py
+ │   ├── service.py           # Lógica de unificación US-UK
+ │   └── integrations/        # Conectores para los dos sistemas EHR legacy
+ ├── appointments/            # Dominio: Experiencia del Paciente
+ │   ├── router.py            # Reservas online, gestión de agendas
  │   └── ...
+ ├── billing/                 # Dominio: Ciclo de Ingresos
+ │   ├── router.py            # Endpoints para reclamaciones (US) y facturación (UK)
+ │   └── ...
+ ├── compliance/              # Dominio: Cumplimiento y Gobierno
+ │   ├── router.py            # Pistas de auditoría, solicitudes de datos de pacientes
+ │   └── ...
+ └── workforce/               # Dominio: Personas y RRHH
+     ├── router.py            # Portal de RRHH, seguimiento de CME
+     └── ...
