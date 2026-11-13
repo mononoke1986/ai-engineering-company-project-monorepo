@@ -37,8 +37,6 @@ Organizaremos el código por áreas de negocio (Vertical Slicing) para reflejar 
  └── workforce/               # Dominio: Personas y RRHH
      ├── router.py            # Portal de RRHH, seguimiento de CME
      └── ...
-
-
 Criterio de separación: Cada carpeta principal es un departamento. Esto permite que si el equipo de Claire (Cumplimiento) pide un cambio en la auditoría, no afecte la lógica de facturación de Tom.
 
 4. Organización de Routers y Endpoints
