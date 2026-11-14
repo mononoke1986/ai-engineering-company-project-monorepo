@@ -1,0 +1,6 @@
+id_incidencia,departamento,categoria,estado,satisfaccion
+1,Operaciones Clinicas,Documentacion,cerrado,5
+2,Experiencia del Paciente,Citas,abierto,
+3,Facturacion,Rechazo de reclamos,cerrado,3
+4,Tecnologia,Fallo de sistema,descartado,
+5,Recursos Humanos,Onboarding,abierto,4
