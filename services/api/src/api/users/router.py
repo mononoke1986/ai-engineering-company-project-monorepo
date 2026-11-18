@@ -8,8 +8,14 @@ from api.profiles.service import create_profile, delete_profile_by_user_id
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.post("", response_model=UserOut, status_code=201)  # PÚBLICA: cualquiera puede registrarse
-def register(data: UserCreate):
+def require_admin(current: dict = Depends(get_current_user)) -> dict:
+    if current["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Solo un admin puede crear usuarios")
+    return current
+
+
+@router.post("", response_model=UserOut, status_code=201)
+def register(data: UserCreate, admin: dict = Depends(require_admin)):
     if service.get_user_by_email(data.email):
         raise HTTPException(status_code=409, detail="Ese email ya está registrado")
     user = service.create_user(data.email, data.password)  # el rol siempre es "user"

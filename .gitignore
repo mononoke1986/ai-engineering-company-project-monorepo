@@ -1,1 +1,5 @@
 node_modules/
+
+# Exportaciones del análisis de incidencias
+results.csv
+resultados_guardados.csv

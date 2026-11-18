@@ -93,6 +93,10 @@ Esto es vital porque nos permitirá versionar la API a medida que integremos los
 
    Los endpoints no hablarán directamente con la base de datos. Habrá una capa de repositorio que abstraerá si los datos vienen de nuestra nueva base de datos o directamente de una consulta a los EHR legacy.
 
+5. **Transporte cifrado (HTTPS/TLS) obligatorio:**
+
+   Todo tráfico con datos de pacientes viajará cifrado entre navegador, frontend y backend. Ningún entorno expuesto fuera de `127.0.0.1` procesará datos reales sin HTTPS aprobado por Cumplimiento. Pendiente: plataforma de despliegue, dominio y certificado.
+
 ## 6. Frontend y Backend Separados
 
 Como el frontend y el backend son sistemas separados, debemos tener en cuenta lo siguiente:

@@ -1,5 +1,6 @@
 .env
 db.json
+audit.log
 .venv
 __pycache__/
 __pycache__/
