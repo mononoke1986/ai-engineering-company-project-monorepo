@@ -1,5 +1,10 @@
 node_modules/
 
+# Archivos temporales de Python y configuración local del editor
+__pycache__/
+*.pyc
+.vscode/
+
 # Exportaciones del análisis de incidencias
 results.csv
 resultados_guardados.csv
