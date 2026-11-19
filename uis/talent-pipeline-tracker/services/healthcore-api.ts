@@ -8,7 +8,7 @@ export async function healthcoreRequest(
   const headers = new Headers(init.headers);
   headers.set("Authorization", `Bearer ${getToken() ?? ""}`);
 
-  const response = await fetch(`/healthcore-api${path}`, {
+  const response = await fetch(path, {
     ...init,
     headers,
   });

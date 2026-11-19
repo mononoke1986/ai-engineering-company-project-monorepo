@@ -11,6 +11,18 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        source: "/users/:path*",
+        destination: `${healthcoreApiOrigin}/users/:path*`,
+      },
+      {
+        source: "/auth/:path*",
+        destination: `${healthcoreApiOrigin}/auth/:path*`,
+      },
+      {
+        source: "/profiles/:path*",
+        destination: `${healthcoreApiOrigin}/profiles/:path*`,
+      },
+      {
         source: "/healthcore-api/:path*",
         destination: `${healthcoreApiOrigin}/:path*`,
       },

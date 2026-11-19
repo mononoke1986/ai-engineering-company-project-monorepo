@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { saveToken } from "@/lib/auth";
 
@@ -24,7 +25,7 @@ export default function LoginPage() {
 
     try {
       // El login usa una petición directa: todavía no existe un token que enviar.
-      const response = await fetch("/healthcore-api/auth/login", {
+      const response = await fetch("/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ username: email, password }),
@@ -92,6 +93,9 @@ export default function LoginPage() {
         </button>
         {error && <p className="text-sm text-red-700" role="alert">{error}</p>}
       </form>
+      <p className="mt-4 text-center text-sm text-slate-600">
+        ¿Aún no tienes cuenta? <Link href="/register" className="font-medium text-teal-700 underline">Crear cuenta</Link>
+      </p>
     </main>
   );
 }
