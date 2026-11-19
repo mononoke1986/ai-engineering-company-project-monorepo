@@ -1,6 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { apiRequest } from "@/lib/api";
+import { getToken, removeToken } from "@/lib/auth";
 
 type GroupStats = Record<string, { count: number; percentage: number }>;
 
@@ -137,51 +140,27 @@ function BreakdownTable({
 }
 
 export default function IncidentsPage() {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [token, setToken] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginError, setLoginError] = useState("");
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  async function handleLogin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLoginError("");
-    setIsLoggingIn(true);
-    try {
-      const response = await fetch("/auth/login", {
-        method: "POST",
-        body: new URLSearchParams({ username: email, password }),
-      });
-      if (!response.ok) {
-        throw new Error("Email o contraseña incorrectos.");
-      }
-      const payload = await response.json();
-      setToken(payload.access_token as string);
-      setPassword("");
-    } catch (requestError) {
-      setLoginError(
-        requestError instanceof Error ? requestError.message : "No se pudo iniciar sesión.",
-      );
-    } finally {
-      setIsLoggingIn(false);
+  // Recupera la sesión guardada; si no hay token, muestra la página de acceso.
+  useEffect(() => {
+    const savedToken = getToken();
+    if (savedToken) {
+      setToken(savedToken);
+    } else {
+      router.replace("/login");
     }
-  }
+  }, [router]);
 
   async function handleExport() {
     setError("");
     try {
-      const response = await fetch("/api/incidents/results/export", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.status === 401) {
-        setLoginError("Tu sesión ha caducado. Vuelve a iniciar sesión.");
-        setToken("");
-        return;
-      }
+      const response = await apiRequest("/api/incidents/results/export");
       if (!response.ok) {
         setError("No se pudo exportar el resultado.");
         return;
@@ -210,16 +189,10 @@ export default function IncidentsPage() {
     formData.append("file", file);
 
     try {
-      const response = await fetch("/api/incidents/analyze", {
+      const response = await apiRequest("/api/incidents/analyze", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-      if (response.status === 401) {
-        setLoginError("Tu sesión ha caducado. Vuelve a iniciar sesión.");
-        setToken("");
-        return;
-      }
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
         throw new Error(
@@ -238,40 +211,7 @@ export default function IncidentsPage() {
     }
   }
 
-  if (!token) {
-    return (
-      <main className="workspace">
-        <section className="page-heading" aria-labelledby="login-title">
-          <p className="eyebrow">ACCESO RESTRINGIDO <span>/</span> HEALTHCORE</p>
-          <h1 id="login-title">Iniciar sesión</h1>
-        </section>
-        <form className="upload-panel" onSubmit={handleLogin}>
-          <label htmlFor="login-email">Email</label>
-          <input
-            id="login-email"
-            type="email"
-            autoComplete="username"
-            required
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-          />
-          <label htmlFor="login-password">Contraseña</label>
-          <input
-            id="login-password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-          <button className="primary-button" type="submit" disabled={isLoggingIn}>
-            {isLoggingIn ? "Entrando…" : "Entrar"}
-          </button>
-          {loginError && <p className="error-message" role="alert">{loginError}</p>}
-        </form>
-      </main>
-    );
-  }
+  if (!token) return null;
 
   const satisfaction = result?.satisfaction;
 
@@ -285,7 +225,12 @@ export default function IncidentsPage() {
         <div className="topbar-context">
           <span className="status-dot" aria-hidden="true" />
           OPERACIONES INTERNAS
-          <button type="button" onClick={() => { setToken(""); setResult(null); }}>
+          <button type="button" onClick={() => {
+            removeToken();
+            setToken("");
+            setResult(null);
+            router.replace("/login");
+          }}>
             Cerrar sesión
           </button>
         </div>
