@@ -12,22 +12,19 @@ export function SessionGuard({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const isPublicPage = PUBLIC_PATHS.includes(pathname);
-  const [hasSession, setHasSession] = useState(false);
-  const [checkedSession, setCheckedSession] = useState(false);
+  const [sessionCheck, setSessionCheck] = useState<{
+    pathname: string;
+    hasToken: boolean;
+  } | null>(null);
 
-  // Revisa el token cada vez que se abre o cambia una página protegida.
+  // Comprueba la sesión para cada ruta protegida y nunca mezcla resultados de rutas distintas.
   useEffect(() => {
-    if (isPublicPage) {
-      setCheckedSession(true);
-      return;
-    }
+    if (isPublicPage) return;
 
-    if (getToken()) {
-      setHasSession(true);
-      setCheckedSession(true);
-    } else {
-      setHasSession(false);
-      setCheckedSession(true);
+    const hasToken = Boolean(getToken());
+    setSessionCheck({ pathname, hasToken });
+
+    if (!hasToken) {
       router.replace("/login");
     }
   }, [isPublicPage, pathname, router]);
@@ -35,12 +32,12 @@ export function SessionGuard({ children }: { children: ReactNode }) {
   /** Borra la sesión y devuelve a la pantalla de inicio de sesión. */
   function handleLogout() {
     removeToken();
-    setHasSession(false);
+    setSessionCheck(null);
     router.replace("/login");
   }
 
   if (isPublicPage) return children;
-  if (!checkedSession || !hasSession) {
+  if (sessionCheck?.pathname !== pathname || !sessionCheck.hasToken) {
     return <main className="workspace"><p role="status">Comprobando sesión…</p></main>;
   }
 
