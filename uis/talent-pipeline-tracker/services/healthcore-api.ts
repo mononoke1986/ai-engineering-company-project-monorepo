@@ -15,7 +15,8 @@ export async function healthcoreRequest(
 
   if (response.status === 401) {
     clearToken();
-    window.location.assign("/login");
+    // La llamada protegida recibió una respuesta de sesión inválida: volver al login.
+    window.location.replace("/login");
   }
 
   return response;
