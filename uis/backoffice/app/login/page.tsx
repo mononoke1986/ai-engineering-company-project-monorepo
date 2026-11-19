@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { saveToken } from "@/lib/auth";
 
 /** Muestra el formulario que inicia sesión con el email y la contraseña. */
@@ -77,6 +78,7 @@ export default function LoginPage() {
           {isSubmitting ? "Entrando…" : "Entrar"}
         </button>
         {error && <p className="error-message" role="alert">{error}</p>}
+        <p className="page-description">¿Aún no tienes cuenta? <Link href="/register">Regístrate</Link></p>
       </form>
     </main>
   );
