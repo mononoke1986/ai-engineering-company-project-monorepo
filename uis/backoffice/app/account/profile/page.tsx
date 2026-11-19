@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { apiRequest } from "@/lib/api";
 
@@ -98,7 +97,7 @@ export default function ProfilePage() {
       <section className="page-heading" aria-labelledby="profile-title">
         <p className="eyebrow">CUENTA <span>/</span> HEALTHCORE</p>
         <h1 id="profile-title">Mi perfil</h1>
-        <p className="page-description"><Link href="/">Volver al inicio</Link></p>
+        <p className="page-description">Actualiza tus datos personales.</p>
       </section>
       <form className="upload-panel" onSubmit={handleSave}>
         <label htmlFor="profile-email">Email</label>

@@ -1,9 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 import { apiRequest } from "@/lib/api";
-import { getToken, removeToken } from "@/lib/auth";
 
 type GroupStats = Record<string, { count: number; percentage: number }>;
 
@@ -140,22 +138,10 @@ function BreakdownTable({
 }
 
 export default function IncidentsPage() {
-  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [token, setToken] = useState("");
-
-  // Recupera la sesión guardada; si no hay token, muestra la página de acceso.
-  useEffect(() => {
-    const savedToken = getToken();
-    if (savedToken) {
-      setToken(savedToken);
-    } else {
-      router.replace("/login");
-    }
-  }, [router]);
 
   async function handleExport() {
     setError("");
@@ -211,31 +197,10 @@ export default function IncidentsPage() {
     }
   }
 
-  if (!token) return null;
-
   const satisfaction = result?.satisfaction;
 
   return (
     <main className="workspace">
-      <header className="topbar">
-        <a className="brand" href="/" aria-label="HealthCore, inicio">
-          <span className="brand-mark" aria-hidden="true">H</span>
-          <span>HealthCore<span className="brand-divider">/</span>Digital</span>
-        </a>
-        <div className="topbar-context">
-          <span className="status-dot" aria-hidden="true" />
-          OPERACIONES INTERNAS
-          <button type="button" onClick={() => {
-            removeToken();
-            setToken("");
-            setResult(null);
-            router.replace("/login");
-          }}>
-            Cerrar sesión
-          </button>
-        </div>
-      </header>
-
       <section className="page-heading" aria-labelledby="page-title">
         <p className="eyebrow">DATOS Y CALIDAD <span>/</span> HEALTHCORE</p>
         <div className="heading-row">
