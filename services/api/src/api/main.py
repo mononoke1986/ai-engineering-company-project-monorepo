@@ -10,10 +10,12 @@ app = FastAPI(title="API segura de la empresa")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    # Permite los frontends locales en cualquier puerto (por ejemplo Next.js
+    # en 3000 o una segunda app en otro puerto), sin abrir CORS a Internet.
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=False,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth_router)
