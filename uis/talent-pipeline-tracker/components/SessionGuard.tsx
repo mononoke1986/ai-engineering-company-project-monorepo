@@ -15,34 +15,109 @@ function SessionGuardContent({ children }: { children: ReactNode }) {
   const isPublicPage = PUBLIC_PATHS.includes(pathname);
   const [sessionCheck, setSessionCheck] = useState<{
     pathname: string;
-    hasToken: boolean;
+    status: "checking" | "authenticated" | "unauthenticated" | "error";
+    message?: string;
   } | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
-  // Guardamos la ruta junto al resultado, para comprobar cada página por separado.
+  // Sin token no llamamos a la API; con token verificamos que la sesión siga vigente.
   useEffect(() => {
     if (isPublicPage) return;
 
-    const hasToken = Boolean(getToken());
-    setSessionCheck({ pathname, hasToken });
-
-    if (!hasToken) {
+    let isCurrent = true;
+    const token = getToken();
+    if (!token) {
       router.replace("/login");
+      // Se actualiza después del efecto: no dejamos el indicador de carga si la
+      // navegación tarda, y evitamos una actualización síncrona dentro del efecto.
+      void Promise.resolve().then(() => {
+        if (isCurrent) setSessionCheck({ pathname, status: "unauthenticated" });
+      });
+      return () => {
+        isCurrent = false;
+      };
     }
-  }, [isPublicPage, pathname, router]);
+
+    const controller = new AbortController();
+    let timedOut = false;
+    const timeoutId = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 10_000);
+
+    async function validateSession() {
+      try {
+        const response = await fetch("/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
+        });
+
+        if (response.status === 401) {
+          clearToken();
+          if (isCurrent) setSessionCheck({ pathname, status: "unauthenticated" });
+          router.replace("/login");
+          return;
+        }
+        if (!response.ok) {
+          throw new Error("No se pudo comprobar la sesión. Inténtalo de nuevo.");
+        }
+
+        if (isCurrent) setSessionCheck({ pathname, status: "authenticated" });
+      } catch (error) {
+        if (!isCurrent || (controller.signal.aborted && !timedOut)) return;
+        setSessionCheck({
+          pathname,
+          status: "error",
+          message: timedOut
+            ? "La comprobación de sesión tardó demasiado. Comprueba tu conexión e inténtalo de nuevo."
+            : error instanceof Error
+              ? error.message
+              : "No se pudo comprobar la sesión. Comprueba tu conexión e inténtalo de nuevo.",
+        });
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+    }
+
+    void validateSession();
+    return () => {
+      isCurrent = false;
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [attempt, isPublicPage, pathname, router]);
 
   function handleLogout() {
     clearToken();
-    setSessionCheck(null);
+    setSessionCheck({ pathname, status: "unauthenticated" });
     router.replace("/login");
   }
 
   if (isPublicPage) return children;
 
-  // Si acabamos de cambiar de ruta, no reutilizamos el resultado de la ruta anterior.
-  if (sessionCheck?.pathname !== pathname || !sessionCheck.hasToken) {
+  // Nunca reutilizamos el resultado de otra ruta ni mostramos contenido sin validar.
+  if (sessionCheck?.pathname !== pathname || sessionCheck.status === "checking") {
     return (
       <main className="mx-auto w-full max-w-6xl px-4 py-8 text-slate-600">
         <p role="status">Comprobando sesión…</p>
+      </main>
+    );
+  }
+  if (sessionCheck.status === "unauthenticated") return null;
+  if (sessionCheck.status === "error") {
+    return (
+      <main className="mx-auto w-full max-w-6xl px-4 py-8 text-slate-600">
+        <p role="alert">{sessionCheck.message}</p>
+        <button
+          type="button"
+          onClick={() => {
+            setSessionCheck({ pathname, status: "checking" });
+            setAttempt((current) => current + 1);
+          }}
+          className="mt-3 rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white"
+        >
+          Reintentar
+        </button>
       </main>
     );
   }
