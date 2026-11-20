@@ -1,61 +1,114 @@
-import pandas as pd
+import argparse
 import sys
+from pathlib import Path
 
-# 1. Recibimos el archivo desde la terminal
-ruta_archivo = sys.argv[1]
 
-try:
-    # Leemos el archivo CSV
-    datos = pd.read_csv(ruta_archivo)
-    print("¡Archivo leído con éxito! 🎉\n")
+API_SOURCE = Path(__file__).resolve().parents[1] / "services" / "api" / "src"
+sys.path.insert(0, str(API_SOURCE))
 
-    # 2. Definimos las reglas (según el Briefing)
-    estados_validos = ['abierto', 'cerrado', 'descartado']
-    columnas_obligatorias = ['id_incidencia', 'departamento', 'categoria', 'estado']
+from api.incidents.analysis import EXTRA_RULES, INVALID_RULES, AnalysisResult, CSVAnalysisError, analyze_csv
 
-    # 3. Buscamos errores (Registros inválidos)
-    registros_invalidos = datos[
-        datos[columnas_obligatorias].isnull().any(axis=1) | # Si falta un dato obligatorio
-        ~datos['estado'].isin(estados_validos)              # Si el estado no es válido
-    ]
-    
-    # Los válidos son el resto
-    registros_validos = datos.drop(registros_invalidos.index)
 
-    # 4. Mostramos el resumen
-    print(f"Total de incidencias procesadas: {len(datos)}")
-    print(f"✅ Incidencias válidas: {len(registros_validos)}")
-    print(f"❌ Incidencias inválidas: {len(registros_invalidos)}\n")
+RULE_LABELS = {
+    "missing_clinic_id": "Invalid or missing clinic_id",
+    "country_mismatch": "Country/clinic mismatch",
+    "missing_category": "Invalid or missing category",
+    "empty_description": "Empty description",
+    "missing_patient_id": "Missing patient_id",
+    "closed_without_score": "Closed case, no score",
+    "score_out_of_range": "Score out of range",
+    "unknown_status": "Invalid or missing status",
+    "malformed_row": "Malformed row",
+}
+SCORE_LABELS = {
+    1: "Very dissatisfied",
+    2: "Dissatisfied",
+    3: "Neutral",
+    4: "Satisfied",
+    5: "Very satisfied",
+}
+WIDTH = 60
+LABEL_COLUMN = 40
 
-    # Si hay inválidos, mostramos cuáles son
-    if len(registros_invalidos) > 0:
-        print("⚠️ Detalle de los registros inválidos:")
-        print(registros_invalidos)
-        print("\n")
 
-    # 5. Calculamos las métricas (solo con los válidos)
-    print("--- MÉTRICAS ---")
-    
-    # Total por categoría
-    print("\nTotal por categoría:")
-    print(registros_validos['categoria'].value_counts())
-    
-    # Total por estado
-    print("\nTotal por estado:")
-    print(registros_validos['estado'].value_counts())
-    
-    # Índice de satisfacción (solo de los que están 'cerrado')
-    cerrados = registros_validos[registros_validos['estado'] == 'cerrado']
-    if not cerrados.empty:
-        promedio_satisfaccion = cerrados['satisfaccion'].mean()
-        print(f"\nÍndice de satisfacción en casos cerrados: {promedio_satisfaccion:.2f} / 5")
+def line(prefix: str, label: str, value: object, suffix: str = "") -> str:
+    left = f"{prefix}{label} "
+    return f"{left}{'.' * max(2, LABEL_COLUMN - len(left))} {value:>3}{suffix}"
 
-    # 6. Preguntar si quiere exportar
-    respuesta = input("\n¿Deseas exportar los resultados a un CSV? (s / n): ")
-    if respuesta.lower() == 's':
-        # Aquí guardamos el archivo
-        registros_validos.to_csv('results.csv', index=False)
-        print("¡Archivo 'results.csv' guardado con éxito en tu carpeta! 📁")
 
-except Exception as e:
-    print(f"¡Ups! Hubo un error: {e}")
+def print_tree(items: list[tuple[str, object, str]], indent: str = "  ") -> None:
+    for index, (label, value, suffix) in enumerate(items):
+        branch = "└─ " if index == len(items) - 1 else "├─ "
+        print(line(indent + branch, label, value, suffix))
+
+
+def print_breakdown(title: str, values: dict[str, int], valid: int) -> None:
+    print(f"\n{title}")
+    print_tree([
+        (key, count, f"  ({count * 100 / valid if valid else 0:.1f}%)")
+        for key, count in values.items()
+    ])
+
+
+def print_report(result: AnalysisResult, source_name: str) -> None:
+    print("=" * WIDTH)
+    print("  HEALTHCORE — PATIENT INCIDENT REPORT ANALYSIS")
+    print(f"  Source file: {source_name}")
+    print("=" * WIDTH)
+
+    print()
+    print(line("", "TOTAL RECORDS IN FILE", result.total_records))
+    print_tree([
+        ("Valid records", result.valid_records, ""),
+        ("Invalid / incomplete", result.invalid_records, ""),
+    ])
+
+    rules = list(INVALID_RULES) + [rule for rule in EXTRA_RULES if result.invalid_by_rule[rule]]
+    print("\nINVALID RECORDS BREAKDOWN")
+    print_tree([(RULE_LABELS[rule], result.invalid_by_rule[rule], "") for rule in rules])
+
+    print_breakdown("BREAKDOWN BY CATEGORY (valid records)", result.categories, result.valid_records)
+    print_breakdown("BREAKDOWN BY STATUS (valid records)", result.statuses, result.valid_records)
+    print_breakdown("BREAKDOWN BY COUNTRY (valid records)", result.countries, result.valid_records)
+
+    print("\nSATISFACTION INDEX (closed cases)")
+    print(f"  Scored cases: {result.scored_cases} of {result.closed_cases}")
+    average = "n/a" if result.average_score is None else f"{result.average_score:.2f} / 5.00"
+    print(f"  Average score: {average}")
+    print_tree([
+        (f"Score {score} ({SCORE_LABELS[score]})", count, "")
+        for score, count in result.score_distribution.items()
+    ])
+
+    print()
+    print("=" * WIDTH)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Validate and summarise a HealthCore incident CSV.")
+    parser.add_argument("csv_path", type=Path, help="Path to the incident CSV file")
+    args = parser.parse_args()
+
+    try:
+        result = analyze_csv(args.csv_path.read_bytes())
+    except OSError as error:
+        print(f"Could not read file: {error.strerror}", file=sys.stderr)
+        return 1
+    except CSVAnalysisError as error:
+        print(f"Invalid CSV: {error}", file=sys.stderr)
+        return 1
+
+    print_report(result, args.csv_path.name)
+    try:
+        answer = input("Export results to CSV? [y / n]: ").strip().lower()
+    except EOFError:
+        answer = "n"
+        print()
+    if answer == "y":
+        Path("results.csv").write_text(result.to_csv(), encoding="utf-8", newline="")
+        print("Results saved to results.csv.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

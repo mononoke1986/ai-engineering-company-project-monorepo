@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { CandidateList } from "@/components/CandidateList";
 
+export const instant = false;
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">

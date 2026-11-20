@@ -8,11 +8,20 @@ from api.profiles.service import create_profile, delete_profile_by_user_id
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.post("", response_model=UserOut, status_code=201)  # PÚBLICA: cualquiera puede registrarse
+@router.post("", response_model=UserOut, status_code=201)
 def register(data: UserCreate):
     if service.get_user_by_email(data.email):
-        raise HTTPException(status_code=409, detail="Ese email ya está registrado")
-    user = service.create_user(data.email, data.password)  # el rol siempre es "user"
+        raise HTTPException(
+            status_code=409,
+            detail=[{
+                "loc": ["body", "email"],
+                "msg": "Ese email ya está registrado",
+                "type": "value_error.duplicate",
+            }],
+        )
+    # El registro público siempre crea usuarios normales. `role` no es un campo
+    # aceptado por UserCreate, por lo que no puede elevar permisos.
+    user = service.create_user(data.email, data.password, role="user")
     create_profile(user["id"], data.name, data.phone, data.address)
     return user
 
